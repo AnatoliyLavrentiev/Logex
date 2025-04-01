@@ -1,0 +1,18 @@
+{# templates/store/import_excel.html.twig #}
+{% extends 'base.html.twig' %}
+
+{% block title %}Import Excel - Magasin{% endblock %}
+
+{% block body %}
+<div class="container mt-5">
+    <h1>🛒 Importer un fichier Excel pour le magasin</h1>
+
+    <form action="{{ path('store_import_excel') }}" method="post" enctype="multipart/form-data">
+        <div class="mb-3">
+            <label for="excel_file" class="form-label fw-semibold">📄 Fichier Excel</label>
+            <input type="file" name="excel_file" id="excel_file" class="form-control" accept=".xls,.xlsx" required>
+        </div>
+        <button type="submit" class="btn btn-primary">📤 Importer</button>
+    </form>
+</div>
+{% endblock %}

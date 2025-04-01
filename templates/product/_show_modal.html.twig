@@ -1,0 +1,28 @@
+<div class="modal-header">
+    <h2 class="modal-title fw-bold text-primary w-100 text-center">
+        <i class="fa-solid fa-box-open me-2"></i>{{ product.prodname }}
+    </h2>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+</div>
+
+<div class="modal-body text-center">
+    <div class="mb-4">
+        {% if product.image %}
+            <img src="{{ asset('uploads/' ~ product.image) }}" alt="{{ product.prodname }}" class="img-thumbnail" style="max-width: 250px;">
+        {% else %}
+            <img src="{{ asset('images/no-image.png') }}" alt="Pas d'image" class="img-thumbnail" style="max-width: 250px;">
+        {% endif %}
+    </div>
+
+    <div class="fs-5">
+        <p><strong><i class="fa-solid fa-tag me-2"></i>Référence :</strong> {{ product.reference }}</p>
+        <p><strong><i class="fa-solid fa-align-left me-2"></i>Description :</strong> {{ product.description }}</p>
+        <p><strong><i class="fa-solid fa-euro-sign me-2"></i>Prix :</strong> {{ product.price }} €</p>
+        <p><strong><i class="fa-solid fa-weight-hanging me-2"></i>Poids :</strong> {{ product.weight }} kg</p>
+        <p><strong><i class="fa-solid fa-folder-open me-2"></i>Catégorie :</strong> {{ product.category }}</p>
+    </div>
+
+    <button type="button" class="btn btn-outline-secondary w-100 mt-4 fs-5" data-bs-dismiss="modal">
+        <i class="fa-solid fa-xmark me-1"></i>Fermer
+    </button>
+</div>

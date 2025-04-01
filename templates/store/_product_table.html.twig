@@ -1,0 +1,31 @@
+{# templates/store/_product_table.html.twig #}
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Название</th>
+            <th>SKU</th>
+            <th>Цена</th>
+            <th>Категория</th>
+            <th>Действия</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for product in products %}
+            <tr>
+                <td>{{ product.id }}</td>
+                <td>{{ product.prodname }}</td>
+                <td>{{ product.sku }}</td>
+                <td>{{ product.price }}</td>
+                <td>{{ product.category }}</td>
+                <td>
+                    <a href="{{ path('product_show', {id: product.id}) }}" class="btn btn-sm btn-info">Просмотр</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="6" class="text-center">Нет товаров</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>

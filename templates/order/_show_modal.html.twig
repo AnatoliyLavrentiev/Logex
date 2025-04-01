@@ -1,0 +1,59 @@
+<div class="modal-header text-primary">
+    <h2 class="modal-title w-100 text-center fs-2">📋 Détails de la commande</h2>
+    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fermer"></button>
+</div>
+
+<div class="modal-body text-center">
+    <div class="card shadow-sm">
+        <div class="card-body fs-5">
+        {% set statusLabels = {
+    'new': '🆕 Nouveau',
+    'executed': '✅ Exécuté',
+    'shipped': '🚚 Expédié',
+    'cancelled': '❌ Annulé'
+} %}
+
+{% set montant = 0 %}
+{% for item in order.orderItems %}
+    {% set product = item.inventory.product %}
+    {% set montant = montant + (product.price * item.quantity) %}
+{% endfor %}
+
+            <p><strong>🧾 Numéro de commande :</strong> {{ order.orderNumber }}</p>
+            <p><strong>📅 Créée le :</strong> {{ order.createdAt|date('d/m/Y H:i') }}</p>
+<p><strong>📌 Statut :</strong> {{ statusLabels[order.status] ?? order.status }}</p>
+            <p><strong>💰 Montant :</strong> {{ montant|number_format(2, ',', ' ') }} €</p>
+            <p><strong>💶 Montant TTC (20% TVA) :</strong> {{ (montant * 1.2)|number_format(2, ',', ' ') }} €</p>
+            <p><strong>✅ Date d'exécution  :</strong>
+                {% if order.delivery and order.delivery.getShippedAt() %}
+                    {{ order.delivery.getShippedAt()|date('d/m/Y H:i') }}
+                {% else %}
+                    —
+                {% endif %}
+            </p>
+            {% if order.delivery and order.delivery.deliveredAt %}
+    <p><strong>📦 Date de livraison :</strong> {{ order.delivery.deliveredAt|date('d/m/Y H:i') }}</p>
+{% endif %}
+
+            {# Détails produits #}
+            <hr>
+            <h5 class="text-primary fw-bold mb-3">🛒 Produits commandés</h5>
+<ul class="list-group text-start">
+    {% for item in order.orderItems %}
+        {% set product = item.inventory.product %}
+        <li class="list-group-item">
+            <strong>{{ product.prodname }}</strong><br>
+            🔢 Référence : {{ product.reference }}<br>
+            📦 Quantité : {{ item.quantity }}<br>
+            💶 Prix unitaire : {{ product.price|number_format(2, ',', ' ') }} €<br>
+            ⚖️ Poids unitaire : {{ product.weight|number_format(2, ',', ' ') }} kg<br>
+            💰 Prix total : {{ (product.price * item.quantity)|number_format(2, ',', ' ') }} €<br>
+            ⚖️ Poids total : {{ (product.weight * item.quantity)|number_format(2, ',', ' ') }} kg
+        </li>
+    {% endfor %}
+</ul>
+        </div>
+    </div>
+
+    <button type="button" class="btn btn-secondary mt-4 w-100 fs-5 d-print-none" data-bs-dismiss="modal">❌ Fermer</button>
+</div>

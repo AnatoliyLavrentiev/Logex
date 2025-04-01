@@ -1,17 +1,472 @@
 <!DOCTYPE html>
-<html>
-    <head>
-        <meta charset="UTF-8">
-        <title>{% block title %}Welcome!{% endblock %}</title>
-        <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text><text y=%221.3em%22 x=%220.2em%22 font-size=%2276%22 fill=%22%23fff%22>sf</text></svg>">
-        {% block stylesheets %}
-        {% endblock %}
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}LOGEX{% endblock %}</title>
 
-        {% block javascripts %}
-            {% block importmap %}{{ importmap('app') }}{% endblock %}
-        {% endblock %}
-    </head>
-    <body>
-        {% block body %}{% endblock %}
-    </body>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ asset('css/styles.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    {% block stylesheets %}
+    <style>
+        @media print {
+            .non-printable {
+                display: none !important;
+            }
+        }
+        .panel-tri .card-header {
+            cursor: pointer;
+        }
+        @media (max-width: 1024px) {
+            .sidebar {
+                display: none !important;
+            }
+        }
+    </style>
+    {% endblock %}
+</head>
+<body data-theme="light">
+
+{# NAVBAR #}
+<nav class="navbar navbar-expand-lg fixed-top" id="mainNavbar">
+  <div class="container-fluid">
+    <a class="navbar-brand logo fw-bold fs-3 d-flex align-items-center text-primary" href="{{ path('homepage') }}">
+      <i class="fa-solid fa-layer-group me-3 fs-2"></i> LOGEX
+    </a>
+
+    {# DESKTOP: Actions à droite #}
+    <div class="d-none d-lg-flex align-items-center ms-auto gap-3">
+      {% if app.user %}
+        <span class="user-info"><i class="fa-solid fa-user me-1"></i> {{ app.user.username }}</span>
+        <a class="btn btn-outline-danger btn-sm" href="{{ path('app_logout') }}">
+          <i class="fa-solid fa-sign-out-alt me-1"></i> Se déconnecter
+        </a>
+      {% else %}
+        <a class="btn btn-outline-primary btn-sm" href="{{ path('app_login') }}">
+          <i class="fa-solid fa-right-to-bracket me-1"></i> Se connecter
+        </a>
+      {% endif %}
+
+      <div class="ms-3">
+<button id="themeToggle" class="theme-switch" aria-label="Changer le thème">
+  <i class="fa-solid fa-sun"></i>
+</button>
+      </div>
+    </div>
+
+    {# MOBILE: Burger button #}
+<button class="navbar-toggler d-lg-none" type="button" id="burgerButton" aria-label="Toggle navigation">
+  <i id="burgerIcon" class="fa-solid fa-bars fa-lg"></i>
+</button>
+
+  </div>
+</nav>
+
+
+{# MOBILE MENU #}
+<div class="collapse position-fixed top-0 start-0 w-100 h-100 overflow-auto d-lg-none" id="mobileNavbar" style="z-index: 1050;">
+  <div class="p-4" id="mobileNavbarInner">
+    <ul class="navbar-nav flex-column">
+      <li class="nav-item"><a class="nav-link" href="{{ path('homepage') }}"><i class="fa-solid fa-house me-2"></i> Accueil</a></li>
+
+      {% if is_granted('ROLE_SUPER_ADMIN') %}
+        <li class="nav-item"><a class="nav-link" href="{{ path('dashboard') }}"><i class="fa-solid fa-chart-line me-2"></i> Tableau de bord</a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ path('reports_index') }}"><i class="fa-solid fa-file-alt me-2"></i> Rapports</a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ path('warehouse_index') }}"><i class="fa-solid fa-warehouse me-2"></i> Entrepôts</a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ path('app_product') }}"><i class="fa-solid fa-cube me-2"></i> Produits</a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ path('inventory_index') }}"><i class="fa-solid fa-clipboard-list me-2"></i> Inventaire</a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ path('order_index') }}"><i class="fa-solid fa-receipt me-2"></i> Commandes</a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ path('store_index') }}"><i class="fa-solid fa-store me-2"></i> Magasin</a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ path('delivery_index') }}"><i class="fa-solid fa-truck me-2"></i> Livraison</a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ path('settings_index') }}"><i class="fa-solid fa-gear me-2"></i> Paramètres</a></li>
+      {% endif %}
+
+      <hr class="my-2">
+
+      {% if app.user %}
+        <li class="nav-item"><span class="nav-link disabled"><i class="fa-solid fa-user me-2"></i> {{ app.user.username }}</span></li>
+        <li class="nav-item"><a class="nav-link text-danger" href="{{ path('app_logout') }}"><i class="fa-solid fa-sign-out-alt me-2"></i> Se déconnecter</a></li>
+      {% else %}
+        <li class="nav-item"><a class="nav-link text-primary" href="{{ path('app_login') }}"><i class="fa-solid fa-right-to-bracket me-2"></i> Se connecter</a></li>
+      {% endif %}
+
+      <li class="nav-item mt-3">
+<li class="nav-item ms-3">
+  <button id="themeToggleMobile" class="theme-switch" aria-label="Changer le thème">
+    <i class="fa-solid fa-sun"></i>
+  </button>
+</li>
+      </li>
+    </ul>
+  </div>
+</div>
+
+
+
+<div class="sidebar d-none d-lg-block">
+    {% include 'sidebar.html.twig' %}
+</div>
+
+<div class="content">
+    {% block body %}{% endblock %}
+</div>
+
+<div class="modal fade" id="modalWindow" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content" id="modalWindowContent"></div>
+    </div>
+</div>
+
+
+{% block javascripts %}
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    console.log("✅ JS chargé et DOM prêt");
+    console.log("burgerButton:", document.getElementById('burgerButton'));
+console.log("mobileNavbar:", document.getElementById('mobileNavbar'));
+    // === INIT ALERT CONTAINER ===
+    const alertContainer = document.createElement('div');
+    alertContainer.id = 'alert403Container';
+    document.body.prepend(alertContainer);
+
+    // === MODAL LOGIC ===
+    const modalElement = document.getElementById('modalWindow');
+    if (modalElement) {
+        const modal = new bootstrap.Modal(modalElement);
+        document.querySelectorAll('.open-global-modal').forEach(link => {
+            link.addEventListener('click', function (e) {
+                e.preventDefault();
+                const url = this.getAttribute('data-url');
+
+                fetch(url)
+                    .then(response => {
+                        if (response.status === 403) {
+                            showForbiddenAlert("Vous n'avez pas l'autorisation d'effectuer cette action.");
+                            throw new Error("403");
+                        }
+                        if (!response.ok) throw new Error("Erreur HTTP: " + response.status);
+                        return response.text();
+                    })
+                    .then(html => {
+                        modalElement.querySelector('.modal-content').innerHTML = html;
+                        modal.show();
+                        setTimeout(() => initModalInventoryLogic(modalElement), 100);
+                    })
+                    .catch(error => console.warn("⛔ Erreur modale:", error.message));
+            });
+        });
+    }
+
+    // === DELIVERY ACTIONS ===
+    document.querySelectorAll('.delivery-action-form').forEach(form => {
+        form.addEventListener('submit', function (e) {
+            e.preventDefault();
+            if (!confirm("Êtes-vous sûr de vouloir effectuer cette action ?")) return;
+
+            const url = this.dataset.url;
+            const formData = new FormData(this);
+
+            fetch(url, {
+                method: 'POST',
+                body: formData,
+                credentials: 'same-origin'
+            })
+                .then(response => {
+                    if (response.status === 403) {
+                        showForbiddenAlert("Vous n'avez pas le droit d'effectuer cette action.");
+                        throw new Error("403");
+                    }
+                    if (response.ok) {
+                        window.location.reload();
+                    }
+                })
+                .catch(error => console.error("Erreur livraison:", error));
+        });
+    });
+
+    // === IMPORT / EXPORT ===
+    document.querySelectorAll('.handle-action').forEach(button => {
+        button.addEventListener('click', function (e) {
+            e.preventDefault();
+            const url = this.dataset.url;
+            const method = this.dataset.method || 'GET';
+            const type = this.dataset.type;
+
+            fetch(url, { method: method })
+                .then(response => {
+                    if (response.status === 403) {
+                        showForbiddenAlert(`Vous n'avez pas le droit de ${type === 'import' ? 'importer' : 'exporter'} les données.`);
+                        throw new Error("403");
+                    }
+                    if (!response.ok) throw new Error("Erreur d'accès");
+
+                    if (type === 'export') {
+                        return response.blob().then(blob => {
+                            const link = document.createElement('a');
+                            link.href = window.URL.createObjectURL(blob);
+                            link.download = 'inventaire.xlsx';
+                            link.click();
+                        });
+                    } else {
+                        window.location.href = url;
+                    }
+                })
+                .catch(error => console.warn('⚠️ Action bloquée', error));
+        });
+    });
+
+    // === ORDER ACTIONS ===
+    document.querySelectorAll('.order-action-form').forEach(form => {
+        form.addEventListener('submit', function (e) {
+            e.preventDefault();
+            if (!confirm("Êtes-vous sûr de vouloir effectuer cette action ?")) return;
+
+            const url = form.getAttribute('data-url');
+            const formData = new FormData(form);
+
+            fetch(url, {
+                method: 'POST',
+                body: formData,
+                credentials: 'same-origin',
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            })
+                .then(response => {
+                    if (response.status === 403) {
+                        return response.text().then(html => {
+                            const container = document.getElementById('alert403Container');
+                            container.innerHTML = html;
+                            setTimeout(() => {
+                                const alert = bootstrap.Alert.getOrCreateInstance(container.querySelector('.alert'));
+                                alert?.close();
+                            }, 5000);
+                        });
+                    } else if (response.ok) {
+                        window.location.reload();
+                    }
+                })
+                .catch(err => {
+                    console.error("Erreur commande:", err);
+                });
+        });
+    });
+
+    // === GENERAL DELETE ACTIONS ===
+    document.querySelectorAll('.delete-form').forEach(form => {
+        form.addEventListener('submit', function (e) {
+            e.preventDefault();
+            if (!confirm("Êtes-vous sûr de vouloir supprimer cette entrée ?")) return;
+
+            const url = this.dataset.url;
+            const formData = new FormData(this);
+
+            fetch(url, {
+                method: 'POST',
+                body: formData
+            })
+                .then(response => {
+                    if (response.status === 403) {
+                        showForbiddenAlert("Vous n'avez pas le droit de supprimer cette entrée.");
+                        throw new Error("403");
+                    }
+                    if (response.status === 500) {
+                        showForbiddenAlert("Impossible de supprimer : cette entrée est liée à une commande.");
+                        throw new Error("500");
+                    }
+                    if (response.ok) {
+                        window.location.reload();
+                    }
+                })
+                .catch(error => console.error('Erreur suppression :', error));
+        });
+    });
+
+    // === ALERT 403 DISPLAY ===
+    function showForbiddenAlert(message = "Action non autorisée.") {
+        const container = document.getElementById('alert403Container');
+        if (!container) return;
+        container.innerHTML = `
+            <div class="alert alert-danger alert-dismissible fade show shadow" role="alert">
+                <i class="fa-solid fa-triangle-exclamation me-2"></i>
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
+            </div>`;
+        setTimeout(() => {
+            const alert = bootstrap.Alert.getOrCreateInstance(container.querySelector('.alert'));
+            alert?.close();
+        }, 5000);
+    }
+
+    // === MODAL INVENTORY LOGIC ===
+    function initModalInventoryLogic(context) {
+        const productSelect = context.querySelector('#inventory_product');
+        const quantityInput = context.querySelector('#inventory_quantity');
+        const priceInput = context.querySelector('#inventory_price');
+        const weightInput = context.querySelector('#inventory_weight');
+        const categoryInput = context.querySelector('#inventory_category');
+        const totalPrice = context.querySelector('#total_price') || context.querySelector('#total_price_edit');
+        const totalWeight = context.querySelector('#total_weight') || context.querySelector('#total_weight_edit');
+
+        if (productSelect && quantityInput && priceInput && weightInput && categoryInput && totalPrice && totalWeight) {
+            const isCreateMode = !priceInput.value || parseFloat(priceInput.value) === 0;
+
+            const updateFields = () => {
+                const selected = productSelect.options[productSelect.selectedIndex];
+                const basePrice = parseFloat(selected.getAttribute("data-price")) || 0;
+                const baseWeight = parseFloat(selected.getAttribute("data-weight")) || 0;
+                const category = selected.getAttribute("data-category") || '';
+                const quantity = parseInt(quantityInput.value) || 1;
+
+                if (isCreateMode) {
+                    priceInput.value = basePrice.toFixed(2);
+                    weightInput.value = baseWeight.toFixed(2);
+                    categoryInput.value = category;
+                }
+
+                const finalPrice = parseFloat(priceInput.value) || 0;
+                const finalWeight = parseFloat(weightInput.value) || 0;
+
+                totalPrice.value = (quantity * finalPrice).toFixed(2);
+                totalWeight.value = (quantity * finalWeight).toFixed(2);
+            };
+
+            productSelect.addEventListener('change', updateFields);
+            quantityInput.addEventListener('input', updateFields);
+            priceInput.addEventListener('input', updateFields);
+            weightInput.addEventListener('input', updateFields);
+            updateFields();
+        }
+    }
+
+    // === THEME TOGGLE ===
+    const themeToggles = Array.from(document.querySelectorAll('[id^="themeToggle"]'));
+    const savedTheme = localStorage.getItem("theme") || "light";
+    document.body.setAttribute("data-theme", savedTheme);
+    updateIcon(savedTheme);
+
+    function updateIcon(theme) {
+        themeToggles.forEach(toggle => {
+            if (toggle) {
+                const icon = toggle.querySelector("i");
+                if (icon) {
+                    icon.className = theme === "dark" ? "fa-solid fa-sun me-1" : "fa-solid fa-moon me-1";
+                }
+            }
+        });
+    }
+
+    function toggleTheme() {
+        const current = document.body.getAttribute("data-theme");
+        const next = current === "light" ? "dark" : "light";
+        document.body.setAttribute("data-theme", next);
+        localStorage.setItem("theme", next);
+        updateIcon(next);
+    }
+
+    themeToggles.forEach(toggle => {
+        if (toggle) toggle.addEventListener("click", toggleTheme);
+    });
+
+    // === TOGGLE SORT PANEL ===
+    const toggleSortPanelBtn = document.getElementById('toggleSortPanel');
+    const sortPanel = document.getElementById('collapseSortPanel');
+    const collapseIcon = document.getElementById('collapseIcon');
+
+    if (toggleSortPanelBtn && sortPanel && collapseIcon) {
+        toggleSortPanelBtn.addEventListener('click', () => {
+            const isShown = sortPanel.classList.contains('show');
+            if (isShown) {
+                bootstrap.Collapse.getInstance(sortPanel)?.hide();
+            } else {
+                new bootstrap.Collapse(sortPanel, { toggle: true });
+            }
+        });
+
+        sortPanel.addEventListener('show.bs.collapse', () => {
+            collapseIcon.classList.replace('fa-chevron-right', 'fa-chevron-down');
+        });
+
+        sortPanel.addEventListener('hide.bs.collapse', () => {
+            collapseIcon.classList.replace('fa-chevron-down', 'fa-chevron-right');
+        });
+
+        if (!sortPanel.classList.contains('show')) {
+            collapseIcon.classList.replace('fa-chevron-down', 'fa-chevron-right');
+        }
+    }
+
+// === BURGER MENU TOGGLE ===
+const mobileNavbar = document.getElementById('mobileNavbar');
+const burgerButton = document.getElementById('burgerButton');
+const mobileInner = document.getElementById('mobileNavbarInner');
+const navbar = document.getElementById('mainNavbar');
+
+if (mobileNavbar && burgerButton) {
+    const bsCollapse = new bootstrap.Collapse(mobileNavbar, { toggle: false });
+    const burgerIcon = document.getElementById('burgerIcon');
+
+    // Устанавливаем отступ сверху для содержимого мобильного меню
+    if (navbar && mobileInner) {
+        const navbarHeight = navbar.offsetHeight;
+        mobileInner.style.paddingTop = `${navbarHeight + 10}px`;
+    }
+
+    burgerButton.addEventListener('click', () => {
+        
+        const isShown = mobileNavbar.classList.contains('show');
+        if (isShown) {
+            bsCollapse.hide();
+        } else {
+            bsCollapse.show();
+        }
+    });
+
+    mobileNavbar.addEventListener('shown.bs.collapse', () => {
+        if (burgerIcon) burgerIcon.className = 'fa-solid fa-xmark fa-lg';
+    });
+
+    mobileNavbar.addEventListener('hidden.bs.collapse', () => {
+        if (burgerIcon) burgerIcon.className = 'fa-solid fa-bars fa-lg';
+    });
+
+    mobileNavbar.querySelectorAll('.nav-link').forEach(link => {
+        link.addEventListener('click', () => {
+            if (mobileNavbar.classList.contains('show')) {
+                bsCollapse.hide();
+            }
+        });
+    });
+}
+
+
+
+
+    // === PRINT TABLE ===
+    window.printTable = function () {
+        const container = document.querySelector('.table-responsive');
+        if (!container) return;
+
+        const clone = container.cloneNode(true);
+        clone.querySelectorAll('thead tr').forEach(row => row.removeChild(row.lastElementChild));
+        clone.querySelectorAll('tbody tr').forEach(row => row.removeChild(row.lastElementChild));
+
+        const printContainer = document.getElementById('printContainer');
+        printContainer.innerHTML = '';
+        printContainer.appendChild(clone);
+        printContainer.style.display = 'block';
+
+        setTimeout(() => window.print(), 300);
+        window.print();
+        printContainer.style.display = 'none';
+    };
+});
+</script>
+
+{% endblock %}
+
+</body>
 </html>

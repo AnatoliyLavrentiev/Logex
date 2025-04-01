@@ -1,0 +1,21 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Produit : {{ product.prodname }}{% endblock %}
+
+{% block body %}
+  <h1>{{ product.prodname }}</h1>
+  
+  {% if product.image %}
+    <img src="{{ asset('uploads/' ~ product.image) }}" alt="{{ product.prodname }}" class="img-fluid">
+  {% else %}
+    <p>Aucune image disponible.</p>
+  {% endif %}
+  
+  <p><strong>SKU :</strong> {{ product.sku }}</p>
+  <p><strong>Description :</strong> {{ product.description }}</p>
+  <p><strong>Prix :</strong> {{ product.price }} €</p>
+  <p><strong>Poids :</strong> {{ product.weight }} kg</p>
+  <p><strong>Catégorie :</strong> {{ product.category }}</p>
+
+  <a href="{{ path('app_product') }}" class="btn btn-secondary mt-3">Retour à la liste</a>
+{% endblock %}

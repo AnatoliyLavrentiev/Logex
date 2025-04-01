@@ -1,0 +1,73 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Tableau de bord{% endblock %}
+
+{% block body %}
+<div class="container mt-5">
+<h1 class="mb-4 text-primary fw-bold">
+    <i class="fa-solid fa-chart-line me-2"></i> Tableau de bord
+</h1>
+
+    <div class="row justify-content-center">
+        <div class="col-md-3">
+            <div class="card text-white bg-primary mb-3 shadow-lg">
+                <div class="card-header text-center">🏢 Entrepôts</div>
+                <div class="card-body text-center">
+                    <h5 class="card-title display-4">{{ warehouseCount }}</h5>
+                    <p class="card-text">Nombre total d'entrepôts</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card text-white bg-success mb-3 shadow-lg">
+                <div class="card-header text-center">🛍️ Produits</div>
+                <div class="card-body text-center">
+                    <h5 class="card-title display-4">{{ productCount }}</h5>
+                    <p class="card-text">Nombre total de produits</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card text-white bg-warning mb-3 shadow-lg">
+                <div class="card-header text-center">📦 Inventaire</div>
+                <div class="card-body text-center">
+                    <h5 class="card-title display-4">{{ totalQuantity }}</h5>
+                    <p class="card-text">Quantité totale en stock</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 🔥 Новая карточка с общей стоимостью инвентаря -->
+        <div class="col-md-3">
+            <div class="card text-white bg-danger mb-3 shadow-lg">
+                <div class="card-header text-center">💰 Valeur totale du stock</div>
+                <div class="card-body text-center">
+                    <h5 class="card-title display-4 stock-value" data-value="{{ totalStockValue }}">
+                        {{ totalStockValue|number_format(0, ',', ' ') }} €
+                    </h5>
+                    <p class="card-text">Valeur estimée du stock</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Скрипт для сокращения больших чисел -->
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const stockValueElement = document.querySelector(".stock-value");
+
+        if (stockValueElement) {
+            let value = parseFloat(stockValueElement.getAttribute("data-value"));
+
+            if (value >= 1000000) {
+                stockValueElement.innerText = (value / 1000000).toFixed(1) + "M €";
+            } else if (value >= 1000) {
+                stockValueElement.innerText = (value / 1000).toFixed(1) + "K €";
+            }
+        }
+    });
+</script>
+{% endblock %}

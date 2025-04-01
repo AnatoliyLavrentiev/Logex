@@ -1,0 +1,118 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Rapports{% endblock %}
+
+{% block body %}
+<div class="container mt-5">
+  <h1 class="mb-4 text-primary fw-bold">
+    <i class="fa-solid fa-chart-column me-2"></i> Rapports
+  </h1>
+
+    <!-- Навигация для переключения графиков -->
+  <div class="d-flex justify-content-center mb-4 flex-wrap gap-2">
+    <button class="btn btn-outline-primary report-btn" data-target="categoryChartCard">
+      <i class="fa-solid fa-boxes-stacked me-2"></i> Produits par catégorie
+    </button>
+    <button class="btn btn-outline-primary report-btn" data-target="warehouseLocationChartCard">
+      <i class="fa-solid fa-location-dot me-2"></i> Entrepôts par ville
+    </button>
+    <button class="btn btn-outline-primary report-btn" data-target="warehouseValueChartCard">
+      <i class="fa-solid fa-coins me-2"></i> Valeur du stock
+    </button>
+    <button class="btn btn-outline-primary report-btn" data-target="productPerWarehouseChartCard">
+      <i class="fa-solid fa-warehouse me-2"></i> Produits par entrepôt
+    </button>
+  </div>
+
+  <!-- Карточки с графиками -->
+  <div class="row">
+    <div class="col-md-12">
+      <div class="card report-card" id="categoryChartCard">
+        <div class="card-body">
+          <h3 class="text-center">
+            <i class="fa-solid fa-boxes-stacked me-2"></i> Répartition des produits par catégorie
+          </h3>
+          <canvas id="categoryChart"></canvas>
+        </div>
+      </div>
+
+      <div class="card report-card d-none" id="warehouseLocationChartCard">
+        <div class="card-body">
+          <h3 class="text-center">
+            <i class="fa-solid fa-location-dot me-2"></i> Répartition des entrepôts par ville
+          </h3>
+          <canvas id="warehouseLocationChart"></canvas>
+        </div>
+      </div>
+
+      <div class="card report-card d-none" id="warehouseValueChartCard">
+        <div class="card-body">
+          <h3 class="text-center">
+            <i class="fa-solid fa-coins me-2"></i> Valeur totale du stock par entrepôt
+          </h3>
+          <canvas id="warehouseValueChart"></canvas>
+        </div>
+      </div>
+
+      <div class="card report-card d-none" id="productPerWarehouseChartCard">
+        <div class="card-body">
+          <h3 class="text-center">
+            <i class="fa-solid fa-warehouse me-2"></i> Nombre de produits par entrepôt
+          </h3>
+          <canvas id="productPerWarehouseChart"></canvas>
+        </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        const createChart = (id, type, labels, data, label, backgroundColors) => {
+            new Chart(document.getElementById(id).getContext('2d'), {
+                type: type,
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: label,
+                        data: data,
+                        backgroundColor: backgroundColors,
+                        borderColor: backgroundColors.map(color => color.replace('0.5', '1')),
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: { y: { beginAtZero: true } }
+                }
+            });
+        };
+
+        const colors = [
+            'rgba(255, 99, 132, 0.5)',
+            'rgba(54, 162, 235, 0.5)',
+            'rgba(255, 206, 86, 0.5)',
+            'rgba(75, 192, 192, 0.5)',
+            'rgba(153, 102, 255, 0.5)',
+            'rgba(255, 159, 64, 0.5)'
+        ];
+
+        createChart('categoryChart', 'bar', {{ categoryLabels|raw }}, {{ categoryValues|raw }}, 'Produits par catégorie', colors);
+        createChart('warehouseLocationChart', 'doughnut', {{ warehouseLocationLabels|raw }}, {{ warehouseLocationValues|raw }}, 'Entrepôts par ville', colors);
+        createChart('warehouseValueChart', 'bar', {{ warehouseValueLabels|raw }}, {{ warehouseValueValues|raw }}, 'Valeur du stock (€)', colors);
+        createChart('productPerWarehouseChart', 'bar', {{ productPerWarehouseLabels|raw }}, {{ productPerWarehouseValues|raw }}, 'Produits par entrepôt', colors);
+
+        // Логика переключения графиков
+        document.querySelectorAll('.report-btn').forEach(button => {
+            button.addEventListener('click', () => {
+                document.querySelectorAll('.report-card').forEach(card => {
+                    card.classList.add('d-none');
+                });
+                document.getElementById(button.getAttribute('data-target')).classList.remove('d-none');
+            });
+        });
+    </script>
+{% endblock %}

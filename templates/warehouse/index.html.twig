@@ -1,0 +1,89 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Liste des entrepôts{% endblock %}
+
+{% block body %}
+<div class="container mt-5">
+    <h1 class="mb-4 text-primary fw-bold">
+        <i class="fa-solid fa-warehouse me-2"></i> Gestion des entrepôts
+    </h1>
+
+    <div id="alert403Container"></div>
+
+    <a href="{{ path('warehouse_new_modal') }}"
+       class="btn btn-primary mb-3 open-global-modal"
+       data-url="{{ path('warehouse_new_modal') }}">
+        <i class="fa-solid fa-plus"></i> Ajouter un nouvel entrepôt
+    </a>
+
+    <form method="get" action="{{ path('warehouse_index') }}" class="mb-3">
+        <div class="input-group">
+            <input type="text" name="q" value="{{ query|default('') }}" class="form-control" placeholder="Recherche par nom, ville ou adresse">
+            <button class="btn btn-outline-secondary" type="submit">
+                <i class="fa-solid fa-magnifying-glass"></i> Rechercher
+            </button>
+        </div>
+    </form>
+
+    <div id="warehouseTableContainer">
+        {% if pagination.items is empty %}
+            <p>Aucun entrepôt trouvé.</p>
+        {% else %}
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped table-hover align-middle">
+                    <thead class="table-dark text-center">
+                        <tr>
+                            <th class="d-none">ID</th>
+                            <th><i class="fa-solid fa-warehouse"></i> Nom</th>
+                            <th><i class="fa-solid fa-city"></i> Ville</th>
+                            <th><i class="fa-solid fa-location-dot"></i> Adresse</th>
+                            <th><i class="fa-solid fa-cubes-stacked"></i> Capacité (m³)</th>
+                            <th><i class="fa-solid fa-calendar-plus"></i> Créé le</th>
+                            <th class="non-printable"><i class="fa-solid fa-gear"></i> Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="text-center">
+                        {% for warehouse in pagination.items %}
+                            <tr>
+                                <td class="d-none">{{ warehouse.id }}</td>
+                                <td>{{ warehouse.name }}</td>
+                                <td>{{ warehouse.location }}</td>
+                                <td>{{ warehouse.adresse }}</td>
+                                <td>{{ warehouse.capaciteStockage }}</td>
+                                <td>{{ warehouse.createdAt|date('d-m-Y H:i') }}</td>
+                                <td class="non-printable">
+                                    <div class="d-flex flex-wrap justify-content-center gap-1">
+                                        <a href="{{ path('warehouse_modal', {'id': warehouse.id}) }}"
+                                           class="btn btn-outline-info btn-sm action-btn open-global-modal"
+                                           data-url="{{ path('warehouse_modal', {'id': warehouse.id}) }}"
+                                           title="Afficher">
+                                            <i class="fa-solid fa-eye"></i>
+                                        </a>
+                                        <a href="{{ path('warehouse_edit_modal', {'id': warehouse.id}) }}"
+                                           class="btn btn-outline-primary btn-sm action-btn open-global-modal"
+                                           data-url="{{ path('warehouse_edit_modal', {'id': warehouse.id}) }}"
+                                           title="Modifier">
+                                            <i class="fa-solid fa-pen"></i>
+                                        </a>
+<form method="post"
+      action="{{ path('warehouse_delete', {'id': warehouse.id}) }}"
+      class="d-inline-block delete-form"
+      data-url="{{ path('warehouse_delete', {'id': warehouse.id}) }}"
+      onsubmit="return confirm('Etes-vous sûr de vouloir supprimer cet entrepôt ?');">
+
+                                            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ warehouse.id) }}">
+                                            <button class="btn btn-outline-danger btn-sm action-btn" title="Supprimer">
+                                                <i class="fa-solid fa-trash"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

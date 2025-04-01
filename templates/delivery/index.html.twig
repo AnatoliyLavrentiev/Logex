@@ -1,0 +1,164 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Livraisons{% endblock %}
+
+{% block body %}
+<div class="container mt-5">
+<h1 class="mb-4 text-primary fw-bold">
+    <i class="fa-solid fa-truck"></i> Suivi des livraisons
+</h1>
+
+<div id="alert403Container"></div>
+
+    {% set deliveries = deliveries|sort((a, b) => b.order.orderNumber <=> a.order.orderNumber) %}
+
+    {% if deliveries is not empty %}
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped table-hover align-middle">
+<thead class="table-dark text-center">
+    <tr>
+        <th><i class="fa-solid fa-calendar-day"></i> Livraison</th>
+        <th><i class="fa-solid fa-thumbtack"></i> Statut</th>
+        <th><i class="fa-solid fa-file-invoice"></i> Commandes</th>
+        <th><i class="fa-solid fa-gear"></i> Actions</th>
+    </tr>
+</thead>
+                <tbody class="text-center">
+                {% set deliveryStatusLabels = {
+    'En Cours': '🚚 En Cours',
+    'Livré': '✅ Livré',
+    'Annulé': '❌ Annulé'
+} %}
+
+                    {% for delivery in deliveries %}
+                        <tr>
+                            <td>
+                                {% if delivery.deliveredAt %}
+                                    {{ delivery.deliveredAt|date('d/m/Y H:i') }}
+                                {% else %}
+                                    —
+                                {% endif %}
+                            </td>
+                            <td>{{ deliveryStatusLabels[delivery.status] ?? delivery.status }}</td>
+                            <td>
+                                {% if delivery.order %}
+                                    <span class="fw-semibold">{{ delivery.order.orderNumber }}</span>
+                                {% else %}
+                                    —
+                                {% endif %}
+                            </td>
+<td>
+    <div class="d-flex flex-wrap justify-content-center gap-2">
+        {% if delivery.status == 'En Cours' %}
+<form method="post"
+      action="{{ path('delivery_recuperate', {'id': delivery.id}) }}"
+      class="delivery-action-form"
+      data-url="{{ path('delivery_recuperate', {'id': delivery.id}) }}"
+      >
+    <input type="hidden" name="_token" value="{{ csrf_token('reception' ~ delivery.id) }}">
+    <button type="submit" class="btn btn-outline-warning btn-sm action-btn" title="Récupérer">
+        <i class="fa-solid fa-inbox"></i>
+    </button>
+</form>
+        {% endif %}
+
+        {% if delivery.order %}
+<a href="javascript:void(0);"
+   class="btn btn-outline-info btn-sm action-btn open-order-modal"
+   data-url="{{ path('order_modal', {'id': delivery.order.id}) }}"
+   title="Afficher">
+    <i class="fa-solid fa-eye"></i>
+</a>
+
+            <button type="button"
+                    class="btn btn-outline-secondary btn-sm action-btn"
+                    onclick="printOrderDetails({{ delivery.order.id }})"
+                    title="Imprimer">
+                <i class="fa-solid fa-print"></i>
+            </button>
+        {% endif %}
+
+<form method="post"
+      action="{{ path('delivery_delete', {'id': delivery.id}) }}"
+      class="delivery-action-form"
+      data-url="{{ path('delivery_delete', {'id': delivery.id}) }}"
+      >
+    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ delivery.id) }}">
+    <button type="submit" class="btn btn-outline-danger btn-sm action-btn" title="Supprimer">
+        <i class="fa-solid fa-trash"></i>
+    </button>
+</form>
+    </div>
+</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="alert alert-info" role="alert">
+            Aucune livraison n'a été trouvée.
+        </div>
+    {% endif %}
+</div>
+
+{# Modale pour afficher les détails complets d'une commande #}
+<div class="modal fade" id="orderDetailModal" tabindex="-1" aria-labelledby="orderDetailModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content" id="order-detail-modal-content">
+      {# Le contenu sera chargé via AJAX #}
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        document.querySelectorAll('.open-order-modal').forEach(function(link) {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                const url = this.getAttribute('data-url');
+                fetch(url, {
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                    credentials: 'same-origin'
+                })
+                .then(response => response.text())
+                .then(html => {
+                    document.getElementById('order-detail-modal-content').innerHTML = html;
+                    const modal = new bootstrap.Modal(document.getElementById('orderDetailModal'));
+                    modal.show();
+                })
+                .catch(error => {
+                    console.error('Erreur chargement commande :', error);
+                });
+            });
+        });
+    });
+
+    function printOrderDetails(orderId) {
+        const url = `/order/${orderId}`;
+
+        fetch(url, {
+            headers: { 'X-Requested-With': 'XMLHttpRequest' },
+            credentials: 'same-origin'
+        })
+        .then(response => response.text())
+        .then(html => {
+            const printWindow = window.open('', '', 'width=800,height=600');
+            printWindow.document.write('<html><head><title>Commande #' + orderId + '</title>');
+            printWindow.document.write('<style>body{font-family:Arial;margin:20px;}ul{padding-left:0;}li{margin-bottom:8px;}button.d-print-none{display:none;}</style>');
+            printWindow.document.write('</head><body>');
+            printWindow.document.write(html);
+            printWindow.document.write('</body></html>');
+            printWindow.document.close();
+            printWindow.focus();
+            printWindow.print();
+        })
+        .catch(error => {
+            console.error("Erreur impression commande:", error);
+        });
+    }
+    </script>
+{% endblock %}

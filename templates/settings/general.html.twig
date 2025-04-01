@@ -1,0 +1,70 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}⚙️ Configuration Générale{% endblock %}
+
+{% block body %}
+<div class="container mt-5">
+    <h1 class="mb-4 text-primary fw-bold"><i class="fa-solid fa-gear"></i> Configuration Générale</h1>
+
+    {{ form_start(form, {'attr': {'class': 'card p-4 shadow-sm'}}) }}
+
+    <div class="mb-3">
+        {{ form_label(form.nomDuSite, "Nom du site") }}
+        {{ form_widget(form.nomDuSite, {'attr': {'class': 'form-control'}}) }}
+    </div>
+
+    <div class="mb-3">
+        {{ form_label(form.description) }}
+        {{ form_widget(form.description, {'attr': {'class': 'form-control'}}) }}
+    </div>
+
+    <div class="mb-3">
+        {{ form_label(form.emailContact) }}
+        {{ form_widget(form.emailContact, {'attr': {'class': 'form-control'}}) }}
+    </div>
+
+    <div class="mb-3 form-check">
+        {{ form_widget(form.modeMaintenance, {'attr': {'class': 'form-check-input'}}) }}
+        {{ form_label(form.modeMaintenance, 'Activer le mode maintenance', {'label_attr': {'class': 'form-check-label'}}) }}
+    </div>
+
+    <hr>
+
+    <h5 class="fw-bold">SEO</h5>
+    <div class="mb-3">
+        {{ form_label(form.metaKeywords) }}
+        {{ form_widget(form.metaKeywords, {'attr': {'class': 'form-control'}}) }}
+    </div>
+    <div class="mb-3">
+        {{ form_label(form.metaDescription) }}
+        {{ form_widget(form.metaDescription, {'attr': {'class': 'form-control'}}) }}
+    </div>
+
+    <hr>
+
+    <h5 class="fw-bold">Réseaux sociaux</h5>
+    <div class="mb-3">
+        {{ form_label(form.facebookUrl) }}
+        {{ form_widget(form.facebookUrl, {'attr': {'class': 'form-control'}}) }}
+    </div>
+    <div class="mb-3">
+        {{ form_label(form.twitterUrl) }}
+        {{ form_widget(form.twitterUrl, {'attr': {'class': 'form-control'}}) }}
+    </div>
+
+    <hr>
+
+    <h5 class="fw-bold">Autres</h5>
+    <div class="mb-3">
+        {{ form_label(form.googleAnalyticsId) }}
+        {{ form_widget(form.googleAnalyticsId, {'attr': {'class': 'form-control'}}) }}
+    </div>
+    <div class="mb-3">
+        {{ form_label(form.faviconUrl) }}
+        {{ form_widget(form.faviconUrl, {'attr': {'class': 'form-control'}}) }}
+    </div>
+
+    <button class="btn btn-success w-100 mt-3">💾 Enregistrer</button>
+    {{ form_end(form) }}
+</div>
+{% endblock %}

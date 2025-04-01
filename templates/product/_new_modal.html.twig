@@ -1,0 +1,146 @@
+<div class="modal-header">
+    <h2 class="modal-title fw-bold text-primary w-100 text-center">
+        <i class="fa-solid fa-box-open me-2"></i>Création d'un nouveau produit
+    </h2>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+</div>
+
+<div class="modal-body text-center">
+    {{ form_start(form, { 'action': path('product_new_modal'), 'attr': {'enctype': 'multipart/form-data'} }) }}
+
+    <div class="mb-3">
+        <label class="form-label fw-semibold d-block text-center">
+            <i class="fa-solid fa-box me-2"></i>Nom du produit
+        </label>
+        {{ form_widget(form.prodname, {'attr': {'class': 'form-control'}}) }}
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label fw-semibold d-block text-center">
+            <i class="fa-solid fa-barcode me-2"></i>Référence
+        </label>
+        {{ form_widget(form.reference, {'attr': {'class': 'form-control'}}) }}
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label fw-semibold d-block text-center">
+            <i class="fa-solid fa-align-left me-2"></i>Description
+        </label>
+        {{ form_widget(form.description, {'attr': {'class': 'form-control'}}) }}
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label fw-semibold d-block text-center">
+            <i class="fa-solid fa-euro-sign me-2"></i>Prix (€)
+        </label>
+        {{ form_widget(form.price, {'attr': {'class': 'form-control'}}) }}
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label fw-semibold d-block text-center">
+            <i class="fa-solid fa-weight-hanging me-2"></i>Poids (kg)
+        </label>
+        {{ form_widget(form.weight, {'attr': {'class': 'form-control'}}) }}
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label fw-semibold d-block text-center">
+            <i class="fa-solid fa-folder-open me-2"></i>Catégorie
+        </label>
+        {{ form_widget(form.category, {'attr': {'class': 'form-control'}}) }}
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label fw-semibold d-block text-center">
+            <i class="fa-solid fa-image me-2"></i>Image du produit
+        </label>
+        {{ form_widget(form.imageFile, {'attr': {'class': 'form-control', 'id': 'imageInput', 'accept': 'image/*'}}) }}
+    </div>
+
+    <div class="text-center mb-3" id="previewContainer">
+        <!-- Prévisualisation de l'image -->
+    </div>
+
+    <button type="submit" class="btn btn-success w-100 fs-5">
+        <i class="fa-solid fa-floppy-disk me-2"></i>Créer le produit
+    </button>
+
+    {{ form_end(form) }}
+</div>
+
+
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    console.log("🔥 JS загружен! Ждём появления #imageInput...");
+
+    let observer = new MutationObserver(() => {
+        let imageInput = document.querySelector("#imageInput");
+        if (imageInput) {
+            console.log("🟢 `#imageInput` появился в DOM!");
+            setupFileInputListener();
+            observer.disconnect(); // Отключаем наблюдение, чтобы не нагружать систему
+        }
+    });
+
+    observer.observe(document.body, { childList: true, subtree: true });
+
+    function setupFileInputListener() {
+        let imageInput = document.querySelector("#imageInput");
+
+        if (!imageInput) {
+            console.warn("⚠️ `#imageInput` не найден, ждём...");
+            return;
+        }
+
+        console.log("✅ Найден input:", imageInput);
+
+        imageInput.addEventListener("change", function (event) {
+            console.log("📂 Файл выбран!");
+
+            let file = event.target.files[0];
+
+            if (!file) {
+                console.warn("⚠️ Файл не был выбран!");
+                return;
+            }
+
+            console.log("📌 Выбран файл:", file.name, "| Тип:", file.type, "| Размер:", file.size, "байт");
+
+            if (!file.type.startsWith("image/")) {
+                console.warn("⚠️ Выбранный файл не является изображением.");
+                return;
+            }
+
+            let reader = new FileReader();
+
+            reader.onload = function (e) {
+                console.log("🔄 FileReader загрузил данные:", e.target.result);
+
+                let previewContainer = document.querySelector("#previewContainer");
+                if (!previewContainer) {
+                    console.error("❌ Ошибка: #previewContainer не найден!");
+                    return;
+                }
+
+                let img = document.createElement("img");
+                img.src = e.target.result;
+                img.alt = "Prévisualisation";
+                img.classList.add("img-thumbnail");
+                img.style.maxWidth = "200px";
+                img.style.display = "block";
+                img.style.margin = "auto";
+
+                previewContainer.innerHTML = "";
+                previewContainer.appendChild(img);
+            };
+
+            reader.onerror = function () {
+                console.error("❌ Ошибка загрузки файла через FileReader!");
+            };
+
+            reader.readAsDataURL(file);
+        });
+    }
+});
+</script>

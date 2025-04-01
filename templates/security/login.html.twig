@@ -1,0 +1,39 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Se connecter{% endblock %}
+
+{% block body %}
+<div class="container d-flex justify-content-center align-items-center min-vh-100">
+    <div class="card shadow-sm p-4" style="width: 100%; max-width: 420px;">
+        <h2 class="mb-4 text-center text-primary">
+            <i class="fa-solid fa-lock"></i> Connexion
+        </h2>
+
+        {% if error %}
+            <div class="alert alert-danger">
+                {{ error.messageKey|trans(error.messageData, 'security') }}
+            </div>
+        {% endif %}
+
+        <form method="post" action="{{ path('app_login') }}">
+            <div class="mb-3">
+                <label for="inputUsername" class="form-label">Nom d'utilisateur</label>
+                <input type="text" id="inputUsername" name="_username" value="{{ last_username }}" class="form-control rounded-3" required autofocus>
+            </div>
+
+            <div class="mb-3">
+                <label for="inputPassword" class="form-label">Mot de passe</label>
+                <input type="password" id="inputPassword" name="_password" class="form-control rounded-3" required>
+            </div>
+
+            <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+
+            <div class="d-grid mt-4">
+                <button class="btn btn-primary rounded-3" type="submit">
+                    <i class="fa-solid fa-right-to-bracket me-2"></i> Se connecter
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

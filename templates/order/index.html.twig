@@ -1,0 +1,187 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Liste des commandes{% endblock %}
+
+{% block body %}
+<div class="container mt-5">
+<h1 class="mb-4 text-primary fw-bold text-center">
+    <i class="fa-solid fa-file-invoice"></i> Liste des commandes
+</h1>
+
+<div id="alert403Container"></div>
+
+<style>
+  #alert403Container {
+    z-index: 9999;
+    position: relative;
+    padding: 1rem;
+    margin-top: 1rem;
+  }
+</style>
+
+    {% if orders is not empty %}
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped table-hover align-middle">
+<thead class="table-dark text-center">
+    <tr>
+        <th><i class="fa-solid fa-hashtag"></i> Numéro</th>
+        <th><i class="fa-solid fa-calendar-plus"></i> Créée le</th>
+        <th><i class="fa-solid fa-thumbtack"></i> Statut</th>
+        <th><i class="fa-solid fa-euro-sign"></i> Montant</th>
+        <th><i class="fa-solid fa-money-bill-wave"></i> TTC</th>
+        <th><i class="fa-solid fa-truck"></i> Expédié le</th>
+        <th><i class="fa-solid fa-gear"></i> Actions</th>
+    </tr>
+</thead>
+                <tbody>
+                {% set statusLabels = {
+    'new': '🆕 Nouveau',
+    'executed': '✅ Exécuté',
+    'shipped': '🚚 Expédié',
+    'cancelled': '❌ Annulé'
+} %}
+                    {% for order in orders %}
+                        <tr>
+                            <td><strong>{{ order.orderNumber }}</strong></td>
+                            <td>{{ order.createdAt|date('d/m/Y H:i') }}</td>
+                            <td>{{ statusLabels[order.status] ?? order.status }}</td>
+                            {% set montant = 0 %}
+{% for item in order.orderItems %}
+    {% set montant = montant + (item.inventory.product.price * item.quantity) %}
+{% endfor %}
+                            <td>{{ montant|number_format(2, ',', ' ') }} €</td>
+                            <td>{{ (montant * 1.20)|number_format(2, ',', ' ') }} €</td>
+                            <td>
+                                {% if order.delivery and order.delivery.getShippedAt() %}
+                                    {{ order.delivery.getShippedAt()|date('d/m/Y H:i') }}
+                                {% else %}
+                                    —
+                                {% endif %}
+                            </td>
+<td class="text-center">
+<div class="d-flex flex-wrap justify-content-center gap-2">
+    {% if order.status == 'new' %}
+<form method="post"
+      action="{{ path('order_execute', {'id': order.id}) }}"
+      class="order-action-form"
+      data-url="{{ path('order_execute', {'id': order.id}) }}">
+    <input type="hidden" name="_token" value="{{ csrf_token('execute' ~ order.id) }}">
+    <button type="submit" class="btn btn-outline-success btn-sm action-btn" title="Exécuter">
+        <i class="fa-solid fa-rocket"></i>
+    </button>
+</form>
+    {% endif %}
+
+<a href="javascript:void(0);"
+   class="btn btn-outline-info btn-sm action-btn open-order-modal"
+   title="Afficher"
+   data-url="{{ path('order_modal', {'id': order.id}) }}">
+    <i class="fa-solid fa-eye"></i>
+</a>
+
+<form method="post"
+      action="{{ path('order_delete', {'id': order.id}) }}"
+      class="order-action-form"
+      data-url="{{ path('order_delete', {'id': order.id}) }}"
+      >
+    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ order.id) }}">
+    <button type="submit" class="btn btn-outline-danger btn-sm action-btn" title="Supprimer">
+        <i class="fa-solid fa-trash"></i>
+    </button>
+</form>
+
+    <button type="button"
+            class="btn btn-outline-secondary btn-sm action-btn"
+            onclick="printOrderDetails({{ order.id }})"
+            title="Imprimer">
+        <i class="fa-solid fa-print"></i>
+    </button>
+</div>
+</td>
+
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="alert alert-info" role="alert">
+            Aucune commande n'a été trouvée.
+        </div>
+    {% endif %}
+</div>
+
+{# Modale pour afficher les détails de la commande #}
+<div class="modal fade" id="orderDetailModal" tabindex="-1" aria-labelledby="orderDetailModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content" id="order-detail-modal-content">
+      {# Le contenu sera chargé via AJAX #}
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Lorsqu'on clique sur "Voir", charger la modale en AJAX
+        document.querySelectorAll('.open-order-modal').forEach(function(link) {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                var url = this.getAttribute('data-url');
+                fetch(url, {
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                    credentials: 'same-origin'
+                })
+                .then(function(response) {
+                    return response.text();
+                })
+                .then(function(html) {
+                    document.getElementById('order-detail-modal-content').innerHTML = html;
+                    var modal = new bootstrap.Modal(document.getElementById('orderDetailModal'));
+                    modal.show();
+                })
+                .catch(function(error) {
+                    console.error('Erreur lors du chargement des détails de la commande :', error);
+                });
+            });
+        });
+    });
+
+function printOrderDetails(orderId) {
+    const url = `/order/${orderId}`;
+
+    fetch(url, {
+        headers: { 'X-Requested-With': 'XMLHttpRequest' },
+        credentials: 'same-origin'
+    })
+    .then(response => response.text())
+    .then(html => {
+        // Удаляем кнопку Fermer вручную из HTML
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = html;
+
+        // Удаляем все кнопки d-print-none (в том числе "Fermer")
+        tempDiv.querySelectorAll('.d-print-none, .modal-footer').forEach(el => el.remove());
+
+        const printWindow = window.open('', '', 'width=800,height=600');
+        printWindow.document.write('<html><head><title>Commande #' + orderId + '</title>');
+        printWindow.document.write('<style>body{font-family:Arial;margin:20px;}table{width:100%;border-collapse:collapse;}th,td{border:1px solid #ccc;padding:8px;text-align:left;}th{background:#f8f9fa;} h1{text-align:center;}</style>');
+        printWindow.document.write('</head><body>');
+        printWindow.document.write(tempDiv.innerHTML);
+        printWindow.document.write('</body></html>');
+        printWindow.document.close();
+        printWindow.focus();
+        printWindow.print();
+    })
+    .catch(error => {
+        console.error("Erreur lors de l'impression :", error);
+        alert("Impossible d'imprimer la commande.");
+    });
+}
+
+
+
+    </script>
+{% endblock %}

@@ -1,0 +1,15 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Добавить новый склад{% endblock %}
+
+{% block body %}
+    <h1>Добавить новый склад</h1>
+
+    {{ form_start(form) }}
+        {{ form_row(form.name) }}
+        {{ form_row(form.location) }}
+        <button class="btn btn-primary">Сохранить</button>
+    {{ form_end(form) }}
+
+    <a href="{{ path('warehouse_index') }}" class="btn btn-secondary mt-3">Вернуться к списку складов</a>
+{% endblock %}

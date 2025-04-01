@@ -1,0 +1,18 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Добавить новую запись инвентаря{% endblock %}
+
+{% block body %}
+  <h1>Добавление новой записи инвентаря</h1>
+
+  {{ form_start(form) }}
+      {# Отобразите поля формы, например: #}
+      {{ form_row(form.product) }}
+      {{ form_row(form.warehouse) }}
+      {{ form_row(form.quantity) }}
+      {# Если в форме есть другие поля, отобразите их при необходимости #}
+      <button class="btn btn-primary">Сохранить</button>
+  {{ form_end(form) }}
+
+  <a href="{{ path('inventory_index') }}" class="btn btn-secondary mt-3">Вернуться к списку инвентаря</a>
+{% endblock %}

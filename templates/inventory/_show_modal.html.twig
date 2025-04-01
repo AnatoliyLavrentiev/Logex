@@ -1,0 +1,30 @@
+<div class="modal-header">
+    <h2 class="modal-title fw-bold text-primary w-100 text-center">
+        <i class="fa-solid fa-clipboard-list me-2"></i>Détail de l’inventaire
+    </h2>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+</div>
+
+<div class="modal-body text-center">
+    <div class="fs-5">
+        <p><strong><i class="fa-solid fa-box-open me-2"></i>Produit :</strong> {{ inventory.product ? inventory.product.prodname : 'N/A' }}</p>
+        <p><strong><i class="fa-solid fa-warehouse me-2"></i>Entrepôt :</strong> {{ inventory.warehouse ? inventory.warehouse.name : 'N/A' }}</p>
+        <p><strong><i class="fa-solid fa-cubes me-2"></i>Quantité :</strong> {{ inventory.quantity }}</p>
+        <p><strong><i class="fa-solid fa-euro-sign me-2"></i>Prix Unitaire :</strong> {{ inventory.price }} €</p>
+        <p><strong><i class="fa-solid fa-weight-hanging me-2"></i>Poids Unitaire :</strong> {{ inventory.weight }} kg</p>
+        <p><strong><i class="fa-solid fa-coins me-2"></i>Prix Total :</strong> {{ (inventory.price * inventory.quantity)|number_format(2, '.', ' ') }} €</p>
+        <p><strong><i class="fa-solid fa-scale-balanced me-2"></i>Poids Total :</strong> {{ (inventory.weight * inventory.quantity)|number_format(2, '.', ' ') }} kg</p>
+        <p><strong><i class="fa-solid fa-folder-open me-2"></i>Catégorie :</strong> {{ inventory.category }}</p>
+        <p><strong><i class="fa-solid fa-clock me-2"></i>Dernière mise à jour :</strong>
+            {% if inventory.updatedAt %}
+                {{ inventory.updatedAt|date('d-m-Y H:i') }}
+            {% else %}
+                N/A
+            {% endif %}
+        </p>
+    </div>
+
+    <button type="button" class="btn btn-outline-secondary w-100 mt-4 fs-5" data-bs-dismiss="modal">
+        <i class="fa-solid fa-xmark me-1"></i>Fermer
+    </button>
+</div>

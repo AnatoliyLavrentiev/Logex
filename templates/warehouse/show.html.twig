@@ -1,0 +1,11 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Просмотр склада: {{ warehouse.name }}{% endblock %}
+
+{% block body %}
+  <div class="container">
+    <h1>Просмотр склада</h1>
+    {% include 'warehouse/_show_modal.html.twig' with { 'warehouse': warehouse } %}
+    <a href="{{ path('warehouse_index') }}" class="btn btn-secondary mt-3">Вернуться к списку складов</a>
+  </div>
+{% endblock %}

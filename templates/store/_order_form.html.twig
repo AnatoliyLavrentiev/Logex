@@ -1,0 +1,68 @@
+<div class="modal-header">
+  <h2 class="modal-title fw-bold text-primary w-100 text-center">
+    <i class="fa-solid fa-clipboard-list me-2"></i>Nouvelle commande
+  </h2>
+  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+</div>
+
+<div class="modal-body">
+  {{ form_start(orderForm, {
+    'attr': { 'id': 'order-form' },
+    'action': path('store_order_new'),
+    'method': 'POST'
+  }) }}
+
+  <div id="order-items-wrapper"
+       data-prototype="{{ form_widget(orderForm.orderItems.vars.prototype)|e('html_attr') }}"
+       class="order-items-collection">
+    
+    {% for itemForm in orderForm.orderItems %}
+      <div class="order-item-form border rounded p-3 mb-3 position-relative">
+        <div class="mb-3 text-center">
+          <label class="fw-semibold">
+            <i class="fa-solid fa-box-open me-2"></i>Produit en stock
+          </label>
+          {{ form_widget(itemForm.inventory, {
+            'attr': {
+              'class': 'form-select bg-body text-body border-secondary',
+              'onchange': 'updateQuantityLimit(this)'
+            }
+          }) }}
+        </div>
+
+        <div class="mb-3 text-center">
+          <label class="fw-semibold">
+            <i class="fa-solid fa-cubes me-2"></i>Quantité à commander
+          </label>
+          {{ form_widget(itemForm.quantity, {
+            'attr': {
+              'class': 'form-control bg-body text-body border-secondary',
+              'min': 1
+            }
+          }) }}
+        </div>
+
+        <div class="text-end mt-2">
+          <button type="button" class="btn btn-outline-danger btn-sm remove-item">
+            <i class="fa-solid fa-trash"></i> Supprimer
+          </button>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+
+  <div class="text-center my-3">
+    <button type="button" class="btn btn-outline-primary" id="add-item-btn">
+      <i class="fa-solid fa-plus me-2"></i>Ajouter un produit
+    </button>
+  </div>
+
+  <div class="mt-4">
+    <button type="submit" class="btn btn-success w-100 fs-5">
+      <i class="fa-solid fa-check me-2"></i>Valider la commande
+    </button>
+  </div>
+
+  {{ form_rest(orderForm) }}
+  {{ form_end(orderForm, { 'render_rest': false }) }}
+</div>

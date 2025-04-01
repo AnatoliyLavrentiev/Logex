@@ -1,0 +1,57 @@
+{# templates/store/_print_table.html.twig #}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Inventaire du magasin - Impression</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { border: 1px solid #333; padding: 8px; text-align: center; }
+        th { background-color: #333; color: #fff; }
+        .logo { margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+    <div class="logo">
+        <h1>Inventaire du magasin</h1>
+    </div>
+    <div class="table-responsive">
+        <table>
+            <thead>
+                <tr>
+                    <th>Image</th>
+                    <th>Référence du Produit</th>
+                    <th>Nom du produit</th>
+                    <th>Prix</th>
+                    <th>Poids</th>
+                    <th>Catégorie</th>
+                    <th>Quantité</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in storeItems %}
+                    <tr>
+                        <td>
+                            {% if item.product.image %}
+                                <img src="{{ asset('uploads/products/' ~ item.product.image) }}" alt="{{ item.product.prodname }}" style="max-width:80px;">
+                            {% else %}
+                                -
+                            {% endif %}
+                        </td>
+                        <td>{{ item.product.reference }}</td>
+                        <td>{{ item.product.prodname }}</td>
+                        <td>{{ item.product.price|number_format(2, ',', ' ') }} €</td>
+                        <td>{{ item.product.weight }} kg</td>
+                        <td>{{ item.product.category }}</td>
+                        <td>{{ item.quantity }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <script>
+        window.print();
+    </script>
+</body>
+</html>

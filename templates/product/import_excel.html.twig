@@ -1,0 +1,16 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Import Excel - Produits{% endblock %}
+
+{% block body %}
+<div class="container mt-5">
+    <h1>📦 Importer un fichier Excel pour les produits</h1>
+    <form method="post" enctype="multipart/form-data">
+        <div class="mb-3">
+            <label for="excel_file" class="form-label fw-semibold">📄 Fichier Excel</label>
+            <input type="file" id="excel_file" name="excel_file" class="form-control" accept=".xls,.xlsx">
+        </div>
+        <button type="submit" class="btn btn-primary">📤 Importer</button>
+    </form>
+</div>
+{% endblock %}

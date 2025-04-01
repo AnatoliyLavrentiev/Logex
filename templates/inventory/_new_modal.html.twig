@@ -1,0 +1,90 @@
+<div class="modal-header">
+  <h2 class="modal-title fw-bold text-primary w-100 text-center">
+    <i class="fa-solid fa-clipboard-list me-2"></i>Nouvelle entrée d'inventaire
+  </h2>
+  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+</div>
+
+<div class="modal-body">
+  {{ form_start(form, {
+    'action': path('inventory_new_modal'),
+    'attr': {'id': 'inventoryNewForm'}
+  }) }}
+
+  <div class="mb-3 text-center">
+    <label class="fw-semibold">
+      <i class="fa-solid fa-box-open me-2"></i>Produit
+    </label>
+    {{ form_widget(form.product, {'attr': {'class': 'form-select'}}) }}
+  </div>
+
+  <div class="mb-3 text-center">
+    <label class="fw-semibold">
+      <i class="fa-solid fa-warehouse me-2"></i>Entrepôt
+    </label>
+    {{ form_widget(form.warehouse, {'attr': {'class': 'form-select'}}) }}
+  </div>
+
+  <div class="mb-3 text-center">
+    <label class="fw-semibold">
+      <i class="fa-solid fa-boxes-stacked me-2"></i>Quantité
+    </label>
+    {{ form_widget(form.quantity, {'attr': {'class': 'form-control'}}) }}
+  </div>
+
+  <div class="mb-3 text-center">
+    <label class="fw-semibold">
+      <i class="fa-solid fa-euro-sign me-2"></i>Prix unitaire (€)
+    </label>
+    {{ form_widget(form.price, {
+      'attr': {
+        'readonly': 'readonly',
+        'class': 'form-control'
+      }
+    }) }}
+  </div>
+
+  <div class="mb-3 text-center">
+    <label class="fw-semibold">
+      <i class="fa-solid fa-weight-hanging me-2"></i>Poids unitaire (kg)
+    </label>
+    {{ form_widget(form.weight, {
+      'attr': {
+        'readonly': 'readonly',
+        'class': 'form-control'
+      }
+    }) }}
+  </div>
+
+  <div class="mb-3 text-center">
+    <label class="fw-semibold">
+      <i class="fa-solid fa-coins me-2"></i>Prix total (€)
+    </label>
+    <input type="text" id="total_price" class="form-control" readonly>
+  </div>
+
+  <div class="mb-3 text-center">
+    <label class="fw-semibold">
+      <i class="fa-solid fa-scale-balanced me-2"></i>Poids total (kg)
+    </label>
+    <input type="text" id="total_weight" class="form-control" readonly>
+  </div>
+
+  <div class="mb-4 text-center">
+    <label class="fw-semibold">
+      <i class="fa-solid fa-folder-open me-2"></i>Catégorie
+    </label>
+    {{ form_widget(form.category, {
+      'attr': {
+        'readonly': 'readonly',
+        'class': 'form-control'
+      }
+    }) }}
+  </div>
+
+  <button type="submit" class="btn btn-success w-100 fs-5">
+    <i class="fa-solid fa-check me-2"></i>Créer l'entrée
+  </button>
+
+  {{ form_end(form) }}
+</div>

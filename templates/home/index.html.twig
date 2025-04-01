@@ -1,0 +1,129 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Bienvenue sur Logex{% endblock %}
+
+{% block body %}
+
+<!-- Видеобаннер -->
+<div class="video-banner">
+  <video autoplay muted loop class="background-video">
+    <source src="/videos/banner.mp4" type="video/mp4">
+    Votre navigateur ne supporte pas les vidéos.
+  </video>
+  <div class="overlay"></div>
+
+  <div class="banner-content">
+    <h1 class="animated-title display-3 fw-bold">Logex</h1>
+    <p class="animated-text fs-4 fw-light">Gérez vos entrepôts, produits et commandes en toute confiance et sans effort.</p>
+  </div>
+</div>
+
+<!-- À propos de la plateforme -->
+<section class="section-light fade-in py-5">
+  <div class="container text-center">
+    <h2 class="mb-4 display-5 fw-semibold text-primary">Pourquoi choisir Logex ?</h2>
+    <p class="lead mb-5">Une plateforme logistique moderne qui centralise la gestion de vos entrepôts, produits, inventaire, commandes et livraisons. Boostez votre efficacité avec des outils puissants et intuitifs.</p>
+
+    <div class="features-grid">
+      <div class="feature-card">
+        <i class="fas fa-boxes-stacked fa-2x mb-2 text-primary"></i>
+        <h4 class="fw-semibold">Gestion des stocks</h4>
+        <p>Surveillez vos niveaux de stock avec précision et en temps réel.</p>
+      </div>
+      <div class="feature-card">
+        <i class="fas fa-truck-loading fa-2x mb-2 text-primary"></i>
+        <h4 class="fw-semibold">Suivi des commandes</h4>
+        <p>Créez, suivez et gérez vos commandes facilement.</p>
+      </div>
+      <div class="feature-card">
+        <i class="fas fa-chart-bar fa-2x mb-2 text-primary"></i>
+        <h4 class="fw-semibold">Statistiques dynamiques</h4>
+        <p>Analysez vos performances avec des rapports détaillés.</p>
+      </div>
+      <div class="feature-card">
+        <i class="fas fa-users-cog fa-2x mb-2 text-primary"></i>
+        <h4 class="fw-semibold">Accès par rôle</h4>
+        <p>Offrez à chaque utilisateur un accès sécurisé et adapté à ses besoins.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Fonctionnement -->
+<section class="section-light py-5 fade-in">
+  <div class="container text-center">
+    <h2 class="mb-5 display-6 fw-bold">Comment ça marche ?</h2>
+    <div class="row g-4">
+      <div class="col-md-4">
+<div class="p-4 border rounded h-100">
+  <i class="fa-solid fa-user-shield fa-2x text-primary mb-3"></i>
+  <h5 class="fw-semibold">1. Accédez avec un compte dédié</h5>
+  <p>Chaque utilisateur dispose d’un accès personnalisé, attribué selon son rôle au sein de l’équipe.</p>
+</div>
+      </div>
+      <div class="col-md-4">
+        <div class="p-4 border rounded h-100">
+          <i class="fa-solid fa-boxes-stacked fa-2x text-primary mb-3"></i>
+          <h5 class="fw-semibold">2. Centralisez vos données</h5>
+          <p>Ajoutez vos produits, entrepôts, inventaires et suivez tout en temps réel.</p>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="p-4 border rounded h-100">
+          <i class="fa-solid fa-chart-line fa-2x text-primary mb-3"></i>
+          <h5 class="fw-semibold">3. Pilotez votre activité</h5>
+          <p>Analysez vos performances, optimisez vos processus et gagnez du temps au quotidien.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Témoignages -->
+<section class="section-dark fade-in py-5">
+  <div class="container text-center">
+    <h2 class="mb-5 display-5 fw-bold">Témoignages clients</h2>
+    <div class="testimonials-grid">
+      <div class="testimonial-card">
+        <p class="fst-italic">« Une plateforme incroyable qui a structuré notre logistique. »</p>
+        <h5 class="fw-bold mt-3">Sarah Dupont</h5>
+        <small>Directrice Marketing</small>
+      </div>
+      <div class="testimonial-card">
+        <p class="fst-italic">« Un CRM intuitif et efficace. Mon équipe l’adore ! »</p>
+        <h5 class="fw-bold mt-3">Lucas Martin</h5>
+        <small>CEO, StartupX</small>
+      </div>
+      <div class="testimonial-card">
+        <p class="fst-italic">« Le meilleur investissement logistique que nous ayons fait. »</p>
+        <h5 class="fw-bold mt-3">Emilie Rousseau</h5>
+        <small>Consultante</small>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Découverte de la plateforme -->
+<section class="section-cta text-center py-5 bg-primary text-white">
+  <div class="container">
+    <h2 class="display-5 mb-3 fw-bold">Découvrez Logex en action</h2>
+    <p class="lead">Un aperçu gratuit pour voir comment Logex peut transformer votre gestion logistique.</p>
+    <a href="mailto:gaguzka@gmail.com?subject=Demande de démo Logex" class="btn btn-light btn-lg mt-3">
+      <i class="fa-solid fa-envelope-open-text me-2"></i> Demander une démo
+    </a>
+  </div>
+</section>
+
+<!-- Pied de page -->
+<footer class="footer py-4">
+  <div class="container text-center">
+    <p class="mb-2">&copy; 2025 Logex. Tous droits réservés.</p>
+    <div class="social-icons">
+      <a href="#" class="me-2"><i class="fab fa-facebook-f"></i></a>
+      <a href="#" class="me-2"><i class="fab fa-twitter"></i></a>
+      <a href="#"><i class="fab fa-linkedin-in"></i></a>
+    </div>
+  </div>
+</footer>
+
+{% endblock %}

@@ -1,0 +1,18 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Детали заказа{% endblock %}
+
+{% block body %}
+<div class="container mt-5">
+    <h1 class="mb-4">Детали заказа #{{ order.id }}</h1>
+    <ul class="list-group">
+        <li class="list-group-item"><strong>Дата создания:</strong> {{ order.createdAt|date('d.m.Y H:i') }}</li>
+        <li class="list-group-item"><strong>Статус:</strong> {{ order.status }}</li>
+        <li class="list-group-item"><strong>Сумма:</strong> {{ order.totalAmount|number_format(2, ',', ' ') }} €</li>
+        <li class="list-group-item"><strong>Данные клиента:</strong> {{ order.clientData|json_encode }}</li>
+    </ul>
+    <a href="{{ path('order_index') }}" class="btn btn-secondary mt-3">
+        <i class="fa-solid fa-arrow-left"></i> Назад к заказам
+    </a>
+</div>
+{% endblock %}

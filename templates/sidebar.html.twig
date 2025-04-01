@@ -1,0 +1,164 @@
+<div class="sidebar-content">
+    <a href="{{ path('homepage') }}"><i class="fa-solid fa-house"></i> Accueil</a>
+
+    {# 🔹 Super Admin — полный доступ ко всему #}
+    {% if is_granted('ROLE_SUPER_ADMIN') %}
+        <a href="{{ path('dashboard') }}"><i class="fa-solid fa-chart-line"></i> Tableau de bord</a>
+        <a href="{{ path('reports_index') }}"><i class="fa-solid fa-file-alt"></i> Rapports</a>
+        <a href="{{ path('warehouse_index') }}"><i class="fa-solid fa-warehouse"></i> Entrepôts</a>
+        <a href="{{ path('app_product') }}"><i class="fa-solid fa-cube"></i> Produits</a>
+        <a href="{{ path('inventory_index') }}"><i class="fa-solid fa-clipboard-list"></i> Inventaire</a>
+        <a href="{{ path('order_index') }}"><i class="fa-solid fa-receipt"></i> Commandes</a>
+        <a href="{{ path('store_index') }}"><i class="fa-solid fa-store"></i> Magasin</a>
+        <a href="{{ path('delivery_index') }}"><i class="fa-solid fa-truck"></i> Livraison</a>
+        <a href="{{ path('settings_index') }}"><i class="fa-solid fa-gear"></i> Paramètres</a>
+
+    {# 🔹 Admin — почти всё, но без прав суперпользователя #}
+    {% elseif is_granted('ROLE_ADMIN') %}
+        <a href="{{ path('dashboard') }}"><i class="fa-solid fa-chart-line"></i> Tableau de bord</a>
+        <a href="{{ path('reports_index') }}"><i class="fa-solid fa-file-alt"></i> Rapports</a>
+        <a href="{{ path('warehouse_index') }}"><i class="fa-solid fa-warehouse"></i> Entrepôts</a>
+        <a href="{{ path('app_product') }}"><i class="fa-solid fa-cube"></i> Produits</a>
+        <a href="{{ path('inventory_index') }}"><i class="fa-solid fa-clipboard-list"></i> Inventaire</a>
+        <a href="{{ path('order_index') }}"><i class="fa-solid fa-receipt"></i> Commandes</a>
+        <a href="{{ path('store_index') }}"><i class="fa-solid fa-store"></i> Magasin</a>
+        <a href="{{ path('delivery_index') }}"><i class="fa-solid fa-truck"></i> Livraison</a>
+        <a href="{{ path('settings_index') }}"><i class="fa-solid fa-gear"></i> Paramètres</a>
+
+    {# 🔹 Entrepôt — доступ к складу и заказам #}
+    {% elseif is_granted('ROLE_ENTREPOT') %}
+        <a href="{{ path('warehouse_index') }}"><i class="fa-solid fa-warehouse"></i> Entrepôts</a>
+        <a href="{{ path('app_product') }}"><i class="fa-solid fa-cube"></i> Produits</a>
+        <a href="{{ path('inventory_index') }}"><i class="fa-solid fa-clipboard-list"></i> Inventaire</a>
+        <a href="{{ path('order_index') }}"><i class="fa-solid fa-receipt"></i> Commandes</a>
+
+    {# 🔹 Magasin — только магазин и доставка #}
+    {% elseif is_granted('ROLE_MAGASIN') %}
+        <a href="{{ path('store_index') }}"><i class="fa-solid fa-store"></i> Magasin</a>
+        <a href="{{ path('delivery_index') }}"><i class="fa-solid fa-truck"></i> Livraison</a>
+
+    {# 🔹 Пользователь — минимальный доступ #}
+    {% elseif is_granted('ROLE_UTILISATEUR') %}
+        <a href="{{ path('dashboard') }}"><i class="fa-solid fa-chart-line"></i> Tableau de bord</a>
+        <a href="{{ path('reports_index') }}"><i class="fa-solid fa-file-alt"></i> Rapports</a>
+    {% endif %}
+
+
+
+    {% set currentRoute = app.request.attributes.get('_route') %}
+    {% set sort = sort|default('') %}
+    {% set order = order|default('asc') %}
+{% if currentRoute starts with 'app_product' or currentRoute starts with 'inventory_' or currentRoute starts with 'store_' %}
+<div class="card panel-tri mt-3">
+<div class="card-header p-0">
+  <button id="toggleSortPanel"
+          class="btn w-100 d-flex justify-content-center align-items-center gap-2"
+          type="button">
+    <span class="fw-semibold" id="sortPanelLabel" style="color: var(--text-color);">Trier par</span>
+    <i class="fa-solid fa-chevron-down" id="collapseIcon"></i>
+  </button>
+</div>
+
+  </div>
+
+  <div class="collapse" id="collapseSortPanel">
+{% if currentRoute starts with 'app_product' %}
+{% set sort = app.request.get('sort')|default('p.prodname') %}
+{% set direction = app.request.get('direction')|default('asc') %}
+
+<ul class="list-group list-group-flush">
+    {% set options = [
+        {label: 'Nom du produit', key: 'p.prodname'},
+        {label: 'Référence', key: 'p.reference'},
+        {label: 'Prix', key: 'p.price'},
+        {label: 'Poids', key: 'p.weight'},
+        {label: 'Catégorie', key: 'p.category'}
+    ] %}
+
+    {% for opt in options %}
+        {% set isCurrent = sort == opt.key %}
+        {% set newDirection = isCurrent and direction == 'asc' ? 'desc' : 'asc' %}
+        <li class="list-group-item">
+            <a href="{{ path('app_product', {
+                sort: opt.key,
+                direction: newDirection,
+                q: query|default('')
+            }) }}">
+                {{ opt.label }}
+                {% if isCurrent %}
+                    <i class="fa-solid fa-arrow-{{ direction == 'asc' ? 'up' : 'down' }}"></i>
+                {% endif %}
+            </a>
+        </li>
+    {% endfor %}
+</ul>
+
+{% elseif currentRoute starts with 'inventory_' %}
+    {% set sort = app.request.get('sort')|default('p.prodname') %}
+    {% set direction = app.request.get('direction')|default('asc') %}
+
+    <ul class="list-group list-group-flush">
+        {% set options = [
+            {label: 'Produit', key: 'p.prodname'},
+            {label: 'Quantité', key: 'i.quantity'},
+            {label: 'Date de mise à jour', key: 'i.updatedAt'},
+            {label: 'Prix', key: 'i.price'},
+            {label: 'Poids', key: 'i.weight'},
+            {label: 'Catégorie', key: 'i.category'},
+        ] %}
+
+        {% for opt in options %}
+            {% set isCurrent = sort == opt.key %}
+            {% set newDirection = isCurrent and direction == 'asc' ? 'desc' : 'asc' %}
+            <li class="list-group-item">
+                <a href="{{ path('inventory_index', {
+                    sort: opt.key,
+                    direction: newDirection,
+                    q: query|default('')
+                }) }}">
+                    {{ opt.label }}
+                    {% if isCurrent %}
+                        <i class="fa-solid fa-arrow-{{ direction == 'asc' ? 'up' : 'down' }}"></i>
+                    {% endif %}
+                </a>
+            </li>
+        {% endfor %}
+    </ul>
+
+
+
+{% elseif currentRoute starts with 'store_' %}
+    {% set sort = app.request.get('sort')|default('prodname') %}
+    {% set direction = app.request.get('direction')|default('asc') %}
+
+    <ul class="list-group list-group-flush">
+        {% set options = [
+            {label: 'Référence', key: 'reference'},
+            {label: 'Prix', key: 'price'},
+            {label: 'Catégorie', key: 'category'},
+            {label: 'Quantité', key: 'quantity'},
+        ] %}
+
+        {% for opt in options %}
+            {% set isCurrent = sort == opt.key %}
+            {% set newDirection = isCurrent and direction == 'asc' ? 'desc' : 'asc' %}
+            <li class="list-group-item">
+                <a href="{{ path('store_index', {
+                    sort: opt.key,
+                    direction: newDirection,
+                    q: query|default('')
+                }) }}">
+                    {{ opt.label }}
+                    {% if isCurrent %}
+                        <i class="fa-solid fa-arrow-{{ direction == 'asc' ? 'up' : 'down' }}"></i>
+                    {% endif %}
+                </a>
+            </li>
+        {% endfor %}
+    </ul>
+{% endif %}
+    </div>
+</div>
+
+{% endif %}
+</div>

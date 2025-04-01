@@ -1,0 +1,25 @@
+framework:
+    workflows:
+        order:
+            type: 'workflow'
+            supports:
+                - App\Entity\Order
+            places:
+                - new
+                - confirmed
+                - ready_to_ship
+                - shipped
+                - delivered
+            transitions:
+                confirm:
+                    from: new
+                    to: confirmed
+                prepare:
+                    from: confirmed
+                    to: ready_to_ship
+                ship:
+                    from: ready_to_ship
+                    to: shipped
+                deliver:
+                    from: shipped
+                    to: delivered

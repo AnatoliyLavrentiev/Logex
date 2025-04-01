@@ -1,0 +1,408 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Magasin{% endblock %}
+
+{% block body %}
+<div class="container mt-5">
+<h1 class="mb-4 text-primary fw-bold">
+    <i class="fa-solid fa-store"></i> Inventaire du magasin
+</h1>
+
+<div id="alert403Container"></div>
+
+    <a href="#" class="btn btn-primary open-store-modal mb-3"
+       data-url="{{ path('store_order_new') }}">
+        <i class="fa-solid fa-cart-plus"></i> Créer une commande
+    </a>
+
+    <form method="get" action="{{ path('store_index') }}" class="mb-3">
+        <div class="input-group">
+            <input type="text" name="q" value="{{ query }}" class="form-control" placeholder="Recherche par produit, référence ou catégorie">
+        <button class="btn btn-outline-secondary" type="submit">
+            <i class="fa-solid fa-magnifying-glass"></i> Rechercher
+        </button>
+        </div>
+    </form>
+
+    <div class="mb-3 d-flex justify-content-end">
+        <button class="btn btn-secondary me-2" onclick="printTable()">
+            <i class="fa-solid fa-print"></i> Imprimer
+        </button>
+<button class="btn btn-outline-primary me-2 handle-action"
+        data-url="{{ path('store_import_excel') }}"
+        data-method="GET"
+        data-type="import">
+    <i class="fa-solid fa-file-import"></i> Import Excel
+</button>
+
+<button class="btn btn-outline-success handle-action"
+        data-url="{{ path('store_export_excel') }}"
+        data-method="GET"
+        data-type="export">
+    <i class="fa-solid fa-file-export"></i> Export Excel
+</button>
+    </div>
+
+    <div id="storeTableContainer">
+        {% if storeItems is not empty %}
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped table-hover align-middle">
+<thead class="table-dark">
+<tr>
+    <th><i class="fa-solid fa-image"></i> Image</th>
+    <th><i class="fa-solid fa-tag"></i> Produit</th>
+    <th><i class="fa-solid fa-barcode"></i> Référence</th>
+    <th style="width: 100px;"><i class="fa-solid fa-euro-sign"></i> Prix unitaire</th>
+    <th style="width: 100px;"><i class="fa-solid fa-weight-hanging"></i> Poids unitaire</th>
+    <th><i class="fa-solid fa-money-bill-wave"></i> Prix total</th>
+    <th><i class="fa-solid fa-scale-balanced"></i> Poids total</th>
+    <th><i class="fa-solid fa-folder"></i> Catégorie</th>
+    <th><i class="fa-solid fa-boxes-stacked"></i> Quantité</th>
+    <th style="width: 140px;"><i class="fa-solid fa-gear"></i> Actions</th>
+</tr>
+</thead>
+                    <tbody>
+                        {% for item in storeItems %}
+                            <tr>
+                                <td>
+{% if item.product.image %}
+    <img src="{{ asset('uploads/products/' ~ item.product.image) }}" alt="{{ item.product.prodname }}" class="img-thumbnail" style="max-width: 80px;">
+{% else %}
+    <img src="{{ asset('images/no-image.jpg') }}" alt="Pas d'image" class="img-thumbnail" style="max-width:100px; max-height:100px;">
+{% endif %}
+                                </td>
+                                <td>{{ item.product.prodname }}</td>
+                                <td>{{ item.product.reference }}</td>
+                                <td>{{ item.unitPrice|number_format(2, ',', ' ') }} €</td>
+                                <td>{{ item.unitWeight|number_format(2, ',', ' ') }} kg</td>
+                                <td>{{ (item.unitPrice * item.quantity)|number_format(2, ',', ' ') }} €</td>
+                                <td>{{ (item.unitWeight * item.quantity)|number_format(2, ',', ' ') }} kg</td>
+                                <td>{{ item.product.category }}</td>
+                                <td>{{ item.quantity }}</td>
+                                <td>
+                                    <div class="d-flex justify-content-center gap-1 flex-wrap">
+                                        <a href="#" class="btn btn-outline-info btn-sm action-btn open-store-modal"
+                                           data-url="{{ path('store_inventory_show', {'id': item.id}) }}" title="Afficher">
+                                            <i class="fa-solid fa-eye"></i>
+                                        </a>
+                                        <a href="#" class="btn btn-outline-primary btn-sm action-btn open-store-modal"
+                                           data-url="{{ path('store_inventory_edit', {'id': item.id}) }}" title="Modifier">
+                                            <i class="fa-solid fa-pen"></i>
+                                        </a>
+<form method="post"
+      action="{{ path('store_inventory_delete', {'id': item.id}) }}"
+      class="delete-form"
+      data-url="{{ path('store_inventory_delete', {'id': item.id}) }}"
+      onsubmit="return false;">
+    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ item.id) }}">
+    <button class="btn btn-outline-danger btn-sm action-btn" title="Supprimer">
+        <i class="fa-solid fa-trash"></i>
+    </button>
+</form>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="alert alert-info">
+                Aucun produit n'est disponible dans le magasin.
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<div class="modal fade" id="orderModal" tabindex="-1" aria-labelledby="orderModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content" id="order-modal-content">
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block stylesheets %}
+{{ parent() }}
+<style>
+.action-btn {
+  width: 36px;
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  font-size: 18px;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+}
+.action-btn:hover {
+  transform: scale(1.1);
+}
+</style>
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    console.log("✅ JS du magasin chargé");
+
+    // 🧼 Удаление задников модалки
+    document.addEventListener('hidden.bs.modal', () => {
+        document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
+    });
+
+    // 🪟 Открытие модалки
+    document.querySelectorAll('.open-store-modal').forEach(button => {
+        button.addEventListener('click', async (e) => {
+            e.preventDefault();
+            const url = button.getAttribute('data-url');
+            console.log("🔹 Chargement du contenu de la modale depuis :", url);
+
+try {
+    const response = await fetch(url, {
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+            'Accept': 'text/html'
+        },
+        credentials: 'same-origin',
+        cache: 'no-store'
+    });
+
+    if (!response.ok) {
+        if (response.status === 403) {
+            showForbiddenAlert("Vous n'avez pas accès à cette fonctionnalité.");
+            return;
+        }
+        throw new Error(`Erreur HTTP: ${response.status}`);
+    }
+
+                const html = await response.text();
+                const modalContent = document.getElementById('order-modal-content');
+                modalContent.innerHTML = html;
+
+                const modalEl = document.getElementById('orderModal');
+                const modal = new bootstrap.Modal(modalEl);
+                modal.show();
+
+                if (url.includes('/order/new')) {
+                    requestAnimationFrame(() => {
+                        console.log("🔧 Initialisation du formulaire de commande");
+                        initOrderForm();
+                    });
+                }
+            } catch (error) {
+                console.error("❌ Erreur lors du chargement de la modale :", error);
+            }
+        });
+    });
+
+    // 🚀 Инициализация формы заказа
+    function initOrderForm() {
+        console.log("🚀 initOrderForm() appelé");
+
+        const form = document.querySelector('#order-modal-content form');
+        const addBtn = document.getElementById('add-item-btn');
+        const itemsWrapper = document.getElementById('order-items-wrapper');
+
+        if (!form || !addBtn || !itemsWrapper) {
+            console.warn("⛔ Élément du formulaire manquant");
+            return;
+        }
+
+        let index = itemsWrapper.querySelectorAll('.order-item-form').length;
+
+        // Добавление нового элемента
+        addBtn.addEventListener('click', () => {
+            const prototype = itemsWrapper.dataset.prototype;
+            const newForm = prototype.replace(/__name__/g, index);
+            const wrapper = document.createElement('div');
+            wrapper.className = 'order-item-form border rounded p-3 mb-3 position-relative bg-light';
+            wrapper.innerHTML = newForm;
+
+            const removeBtn = document.createElement('button');
+            removeBtn.type = 'button';
+            removeBtn.className = 'btn btn-outline-danger btn-sm position-absolute top-0 end-0 m-2 remove-item';
+            removeBtn.innerHTML = '<i class="fa-solid fa-trash"></i>';
+            removeBtn.addEventListener('click', () => wrapper.remove());
+
+            wrapper.appendChild(removeBtn);
+            itemsWrapper.appendChild(wrapper);
+            index++;
+
+            applyQuantityLimit(wrapper);
+        });
+
+        // Применить лимит на уже существующие
+        itemsWrapper.querySelectorAll('.order-item-form').forEach(applyQuantityLimit);
+
+        // Удаление существующих
+        itemsWrapper.querySelectorAll('.remove-item').forEach(btn => {
+            btn.addEventListener('click', () => btn.closest('.order-item-form').remove());
+        });
+
+        // Обработка отправки формы
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(form);
+            const action = form.getAttribute('action');
+
+            try {
+                const response = await fetch(action, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    credentials: 'same-origin'
+                });
+
+                const contentType = response.headers.get('content-type');
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(errorText);
+                }
+
+                if (contentType && contentType.includes('application/json')) {
+                    const data = await response.json();
+
+                    if (data.success && data.redirect) {
+                        const successAlert = document.createElement('div');
+                        successAlert.className = 'alert alert-success text-center fs-5';
+                        successAlert.innerHTML = '✅ Commande créée avec succès ! Redirection...';
+                        form.parentElement.prepend(successAlert);
+
+                        setTimeout(() => {
+                            window.location.href = data.redirect;
+                        }, 2000);
+                    } else if (data.errors) {
+                        alert("❌ Erreurs :\n" + data.errors.join('\n'));
+                    } else {
+                        alert("❌ Erreur inconnue lors de la création de la commande.");
+                    }
+                } else {
+                    const html = await response.text();
+                    document.getElementById('order-modal-content').innerHTML = html;
+                }
+            } catch (error) {
+                console.error("❌ Erreur lors de la soumission du formulaire :", error.message);
+                alert("❌ Erreur interne :\n" + error.message);
+            }
+        });
+    }
+
+    // 📦 Установить max для поля quantité на основе выбранного продукта
+    function applyQuantityLimit(wrapper) {
+        const select = wrapper.querySelector('select');
+        const quantityInput = wrapper.querySelector('input[type="number"]');
+
+        const updateLimit = () => {
+            const selectedOption = select.options[select.selectedIndex];
+            const match = selectedOption.textContent.match(/stock\s*:\s*(\d+)/i);
+            const stock = match ? parseInt(match[1], 10) : null;
+
+            if (stock !== null && quantityInput) {
+                quantityInput.setAttribute('max', stock);
+                quantityInput.setAttribute('min', 1);
+
+                quantityInput.addEventListener('input', () => {
+                    const val = parseInt(quantityInput.value);
+                    if (val > stock) quantityInput.value = stock;
+                });
+            }
+        };
+
+        if (select && quantityInput) {
+            updateLimit();
+            select.addEventListener('change', updateLimit);
+        }
+    }
+
+    function showForbiddenAlert(message = "Action non autorisée.") {
+    const container = document.getElementById('alert403Container');
+    if (!container) return;
+
+    container.innerHTML = '';
+
+    const alertHTML = `
+        <div class="alert alert-danger alert-dismissible fade show text-center m-3 shadow" role="alert" style="z-index: 9999;">
+            <i class="fa-solid fa-triangle-exclamation me-2"></i>
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
+        </div>
+    `;
+
+    container.innerHTML = alertHTML;
+
+    setTimeout(() => {
+        const alert = bootstrap.Alert.getOrCreateInstance(container.querySelector('.alert'));
+        alert?.close();
+    }, 5000);
+}
+
+
+        // 🖨️ Impression de la table d'inventaire
+    window.printTable = function () {
+        const container = document.getElementById('storeTableContainer');
+        if (!container) return;
+
+        const clone = container.cloneNode(true);
+        const table = clone.querySelector('table');
+
+        if (table) {
+            table.querySelectorAll('thead tr').forEach(row => {
+                if (row.lastElementChild) row.removeChild(row.lastElementChild);
+            });
+            table.querySelectorAll('tbody tr').forEach(row => {
+                if (row.lastElementChild) row.removeChild(row.lastElementChild);
+            });
+
+            table.querySelectorAll('img').forEach(img => {
+                const src = img.getAttribute('src');
+                const alt = img.getAttribute('alt') || 'Image';
+                const printableImg = document.createElement('img');
+                printableImg.src = src;
+                printableImg.alt = alt;
+                printableImg.style.maxWidth = '80px';
+                printableImg.style.borderRadius = '6px';
+                printableImg.style.boxShadow = '0 0 3px rgba(0,0,0,0.3)';
+                img.replaceWith(printableImg);
+            });
+        }
+
+        const printHeader = document.createElement('div');
+        printHeader.style.textAlign = 'center';
+        printHeader.style.marginBottom = '20px';
+        const today = new Date();
+        const dateString = today.toLocaleDateString('fr-FR') + ' ' + today.toLocaleTimeString('fr-FR');
+        printHeader.innerHTML = `<h1>Inventaire du magasin</h1><p>Date d'impression : ${dateString}</p>`;
+
+        const printContent = document.createElement('div');
+        printContent.appendChild(printHeader);
+        printContent.appendChild(clone);
+
+        const printWindow = window.open('', '', 'width=1000,height=800');
+        printWindow.document.write('<html><head><title>Impression</title>');
+        printWindow.document.write(`
+            <style>
+                body { font-family: Arial; margin: 20px; }
+                table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+                th, td { border: 1px solid #333; padding: 8px; text-align: center; }
+                th { background: #333; color: #fff; }
+                img { max-width: 80px; }
+            </style>
+        `);
+        printWindow.document.write('</head><body>');
+        printWindow.document.write(printContent.innerHTML);
+        printWindow.document.write('</body></html>');
+        printWindow.document.close();
+        printWindow.focus();
+        printWindow.print();
+        printWindow.close();
+    };
+});
+</script>
+
+{% endblock %}

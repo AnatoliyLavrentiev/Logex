@@ -1,0 +1,96 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Créer un utilisateur{% endblock %}
+
+{% block body %}
+<div class="container mt-5">
+    <h1 class="mb-4 text-success fw-bold d-flex align-items-center justify-content-center gap-2">
+        <i class="fa-solid fa-user-plus"></i> Créer un utilisateur
+    </h1>
+
+    <div class="card shadow-sm border-success">
+        <div class="card-body">
+            {{ form_start(form) }}
+            <div class="row g-4 align-items-start">
+                <div class="col-md-6">
+                    <label for="{{ form.username.vars.id }}" class="form-label fw-semibold">
+                        Nom d’utilisateur
+                    </label>
+                    {{ form_widget(form.username, {
+                        'attr': {
+                            'class': 'form-control rounded-3' ~ (form_errors(form.username) ? ' is-invalid' : '')
+                        }
+                    }) }}
+                    {% if form_errors(form.username) %}
+                        <div class="invalid-feedback d-block mt-1">
+                            {{ form_errors(form.username) }}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="col-md-6">
+                    <label for="{{ form.password.vars.id }}" class="form-label fw-semibold">
+                        Mot de passe
+                    </label>
+                    {{ form_widget(form.password, {
+                        'attr': {
+                            'class': 'form-control rounded-3' ~ (form_errors(form.password) ? ' is-invalid' : '')
+                        }
+                    }) }}
+                    {% if form_errors(form.password) %}
+                        <div class="invalid-feedback d-block mt-1">
+                            {{ form_errors(form.password) }}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="col-12">
+                    <label class="form-label fs-5 fw-bold mb-3">Rôles</label>
+                    <div class="d-flex flex-column gap-3 ms-2">
+                        {% for checkbox in form.roles %}
+                            <div class="form-check fs-5">
+                                {{ form_widget(checkbox, {
+                                    'attr': {
+                                        'class': 'form-check-input',
+                                        'style': 'transform: scale(1.3); margin-right: 10px;'
+                                    }
+                                }) }}
+                                {{ form_label(checkbox, null, {'label_attr': {'class': 'form-check-label'}}) }}
+
+                                {% set role = checkbox.vars.value %}
+                                {% set badge = {
+                                    'ROLE_USER':    {label: 'Utilisateur',      class: 'bg-secondary'},
+                                    'ROLE_MAGASIN': {label: 'Magasin',         class: 'bg-warning text-dark'},
+                                    'ROLE_ENTREPOT':{label: 'Entrepôt',        class: 'bg-info text-dark'},
+                                    'ROLE_ADMIN':   {label: 'Admin',           class: 'bg-danger'},
+                                    'ROLE_ORDER_CREATE':     {label: 'Commandes',      class: 'bg-primary'},
+                                    'ROLE_WAREHOUSE_READ':   {label: 'Entrepôts',      class: 'bg-secondary'},
+                                    'ROLE_PRODUCT_READ':     {label: 'Produits',       class: 'bg-success'},
+                                    'ROLE_INVENTORY_READ':   {label: 'Inventaire',     class: 'bg-secondary'},
+                                    'ROLE_STORE_READ':       {label: 'Magasin (lecture)', class: 'bg-info text-dark'},
+                                    'ROLE_DELIVERY_READ':    {label: 'Livraisons',      class: 'bg-secondary'},
+                                    'ROLE_SUPER_ADMIN':      {label: 'Super Admin',     class: 'bg-dark'}
+                                }[role] %}
+
+                                {% if badge is defined %}
+                                    <span class="badge {{ badge.class }} ms-2">{{ badge.label }}</span>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-4 d-flex justify-content-between">
+                <button type="submit" class="btn btn-success">
+                    <i class="fa-solid fa-floppy-disk"></i> Enregistrer
+                </button>
+                <a href="{{ path('settings_users') }}" class="btn btn-outline-secondary">
+                    <i class="fa-solid fa-arrow-left"></i> Retour à la liste
+                </a>
+            </div>
+            {{ form_end(form) }}
+        </div>
+    </div>
+</div>
+{% endblock %}

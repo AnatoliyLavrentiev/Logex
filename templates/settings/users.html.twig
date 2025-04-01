@@ -1,0 +1,59 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Gestion des utilisateurs{% endblock %}
+
+{% block body %}
+<div class="container mt-5">
+<h1 class="mb-4 text-primary fw-bold text-center">
+    <i class="fa-solid fa-users me-2"></i> Gestion des utilisateurs
+</h1>
+
+    <a href="{{ path('settings_utilisateur_create') }}" class="btn btn-success mb-3">
+        ➕ Créer un utilisateur
+    </a>
+
+    <div class="table-responsive">
+        <table class="table table-striped table-bordered align-middle">
+            <thead class="table-dark">
+                <tr>
+{# ID column removed #}
+<th>Nom d'utilisateur</th>
+<th>Rôles</th>
+<th class="text-center">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for utilisateur in utilisateurs %}
+                    <tr>
+{# Inside the loop #}
+<td>{{ utilisateur.username }}</td>
+<td>{{ utilisateur.roles | join(', ') }}</td>
+<td class="text-center">
+    <div class="d-flex flex-wrap justify-content-center gap-1">
+        <a href="{{ path('settings_utilisateur_edit', {'id': utilisateur.id}) }}"
+           class="btn btn-outline-primary btn-sm"
+           title="Modifier">
+            <i class="fa-solid fa-pen"></i>
+        </a>
+
+        <form method="post" action="{{ path('settings_users_delete', {'id': utilisateur.id}) }}"
+              onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cet utilisateur ?');"
+              class="d-inline">
+            <input type="hidden" name="_token" value="{{ csrf_token('delete_user_' ~ utilisateur.id) }}">
+            <button class="btn btn-outline-danger btn-sm" title="Supprimer">
+                <i class="fa-solid fa-trash"></i>
+            </button>
+        </form>
+    </div>
+</td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="4" class="text-center text-muted">Aucun utilisateur trouvé.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

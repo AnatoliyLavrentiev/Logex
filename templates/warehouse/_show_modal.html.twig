@@ -1,0 +1,17 @@
+<div class="modal-header">
+    <h2 class="modal-title fw-bold text-primary w-100 text-center">
+        <i class="fa-solid fa-warehouse me-2"></i>{{ warehouse.name }}
+    </h2>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+</div>
+
+<div class="modal-body fs-5 text-center">
+    <p><strong><i class="fa-solid fa-city me-2"></i>Ville :</strong> {{ warehouse.location }}</p>
+    <p><strong><i class="fa-solid fa-location-dot me-2"></i>Adresse :</strong> {{ warehouse.adresse }}</p>
+    <p><strong><i class="fa-solid fa-cubes-stacked me-2"></i>Capacité de stockage :</strong> {{ warehouse.capaciteStockage }} m³</p>
+    <p><strong><i class="fa-solid fa-calendar-days me-2"></i>Créé le :</strong> {{ warehouse.createdAt|date('d-m-Y H:i') }}</p>
+
+    <button type="button" class="btn btn-outline-secondary w-100 mt-4 fs-5" data-bs-dismiss="modal">
+        <i class="fa-solid fa-xmark me-1"></i>Fermer
+    </button>
+</div>

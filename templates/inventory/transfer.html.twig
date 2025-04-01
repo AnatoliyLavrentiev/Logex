@@ -1,0 +1,20 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Перенос товара{% endblock %}
+
+{% block body %}
+  <h1>Перенос товара</h1>
+
+  <p>
+    Источник: Склад "{{ inventory.warehouse.name }}", Товар: "{{ inventory.product.prodname }}",
+    Доступно: {{ inventory.quantity }}
+  </p>
+
+  {{ form_start(transferForm) }}
+      {{ form_row(transferForm.destinationWarehouse) }}
+      {{ form_row(transferForm.quantity) }}
+      <button class="btn btn-primary">Выполнить перенос</button>
+  {{ form_end(transferForm) }}
+
+  <a href="{{ path('inventory_index') }}" class="btn btn-secondary mt-3">Вернуться к списку инвентаря</a>
+{% endblock %}

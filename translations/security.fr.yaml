@@ -1,0 +1,5 @@
+# translations/security.fr.yaml
+
+security:
+    # Сообщение об ошибке при неверных учётных данных
+    Invalid credentials. : 'Identifiants invalides'

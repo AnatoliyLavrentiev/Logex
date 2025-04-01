@@ -1,0 +1,41 @@
+<div class="modal-header">
+    <h2 class="modal-title fw-bold text-primary w-100 text-center">
+        <i class="fa-solid fa-store me-2"></i>{{ inventory.product.prodname }}
+    </h2>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+</div>
+
+<div class="modal-body text-center fs-5">
+
+    {% if inventory.product.image %}
+        <img src="{{ asset('uploads/products/' ~ inventory.product.image) }}"
+             alt="{{ inventory.product.prodname }}"
+             class="img-thumbnail mb-4"
+             style="max-width: 200px;">
+    {% else %}
+        <img src="{{ asset('images/no-image.jpg') }}"
+             alt="Aucune image"
+             class="img-thumbnail mb-4"
+             style="max-width: 200px;">
+    {% endif %}
+
+    <p><strong><i class="fa-solid fa-tag me-2"></i>Produit :</strong> {{ inventory.product.prodname }}</p>
+    <p><strong><i class="fa-solid fa-hashtag me-2"></i>Référence :</strong> {{ inventory.product.reference }}</p>
+    <p><strong><i class="fa-solid fa-euro-sign me-2"></i>Prix unitaire :</strong> {{ inventory.product.price|number_format(2, ',', ' ') }} €</p>
+    <p><strong><i class="fa-solid fa-weight-hanging me-2"></i>Poids unitaire :</strong> {{ inventory.product.weight }} kg</p>
+    <p><strong><i class="fa-solid fa-boxes-stacked me-2"></i>Quantité :</strong> {{ inventory.quantity }}</p>
+    <p><strong><i class="fa-solid fa-coins me-2"></i>Prix total :</strong> {{ (inventory.product.price * inventory.quantity)|number_format(2, ',', ' ') }} €</p>
+    <p><strong><i class="fa-solid fa-scale-balanced me-2"></i>Poids total :</strong> {{ (inventory.product.weight * inventory.quantity)|number_format(2, ',', ' ') }} kg</p>
+    <p><strong><i class="fa-solid fa-folder-open me-2"></i>Catégorie :</strong> {{ inventory.product.category }}</p>
+    <p><strong><i class="fa-regular fa-clock me-2"></i>Dernière mise à jour :</strong>
+        {% if inventory.updatedAt %}
+            {{ inventory.updatedAt|date('d-m-Y H:i') }}
+        {% else %}
+            N/A
+        {% endif %}
+    </p>
+
+    <button type="button" class="btn btn-outline-secondary w-100 mt-4 fs-5" data-bs-dismiss="modal">
+        <i class="fa-solid fa-xmark me-1"></i>Fermer
+    </button>
+</div>

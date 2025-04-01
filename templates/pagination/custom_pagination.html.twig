@@ -1,0 +1,52 @@
+{% if pageCount > 1 %}
+<nav>
+  <ul class="pagination justify-content-center">
+
+    {# « Première #}
+    {% if current != first %}
+      <li class="page-item">
+        <a class="page-link" href="{{ path(route, query|merge({(pageParameterName): first})) }}">
+          <i class="fas fa-angle-double-left"></i> Première
+        </a>
+      </li>
+    {% endif %}
+
+    {# ← Précédent #}
+    {% if previous is defined %}
+      <li class="page-item">
+        <a class="page-link" href="{{ path(route, query|merge({(pageParameterName): previous})) }}">
+          <i class="fas fa-angle-left"></i> Précédent
+        </a>
+      </li>
+    {% endif %}
+
+    {# Numéros de page #}
+    {% for page in pagesInRange %}
+      <li class="page-item {{ page == current ? 'active' : '' }}">
+        <a class="page-link" href="{{ path(route, query|merge({(pageParameterName): page})) }}">
+          {{ page }}
+        </a>
+      </li>
+    {% endfor %}
+
+    {# Suivant → #}
+    {% if next is defined %}
+      <li class="page-item">
+        <a class="page-link" href="{{ path(route, query|merge({(pageParameterName): next})) }}">
+          Suivant <i class="fas fa-angle-right"></i>
+        </a>
+      </li>
+    {% endif %}
+
+    {# Dernière » #}
+    {% if current != last %}
+      <li class="page-item">
+        <a class="page-link" href="{{ path(route, query|merge({(pageParameterName): last})) }}">
+          Dernière <i class="fas fa-angle-double-right"></i>
+        </a>
+      </li>
+    {% endif %}
+
+  </ul>
+</nav>
+{% endif %}

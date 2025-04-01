@@ -1,0 +1,128 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Modifier un utilisateur{% endblock %}
+
+{% block body %}
+<div class="container mt-5">
+    <h1 class="mb-4 text-primary fw-bold d-flex align-items-center justify-content-center gap-2">
+        <i class="fa-solid fa-user-pen"></i> Modifier l’utilisateur : {{ utilisateur.username }}
+    </h1>
+
+    <div class="card shadow-sm border-primary">
+        <div class="card-body">
+            {{ form_start(form) }}
+            <div class="row g-4 align-items-start">
+                <div class="col-md-6">
+                    <label for="{{ form.username.vars.id }}" class="form-label fw-semibold">
+                        Nom d’utilisateur
+                    </label>
+                    {{ form_widget(form.username, {
+                        'attr': {
+                            'class': 'form-control rounded-3' ~ (form_errors(form.username) ? ' is-invalid' : '')
+                        }
+                    }) }}
+                    {% if form_errors(form.username) %}
+                        <div class="invalid-feedback d-block mt-1">
+                            {{ form_errors(form.username) }}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="col-md-6">
+                    <label for="{{ form.plainPassword.vars.id }}" class="form-label fw-semibold">
+                        Nouveau mot de passe
+                    </label>
+                    {{ form_widget(form.plainPassword, {
+                        'attr': {
+                            'class': 'form-control rounded-3' ~ (form_errors(form.plainPassword) ? ' is-invalid' : '')
+                        }
+                    }) }}
+                    {% if form_errors(form.plainPassword) %}
+                        <div class="invalid-feedback d-block mt-1">
+                            {{ form_errors(form.plainPassword) }}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="col-12">
+                    <label class="form-label fs-5 fw-bold mb-3">Rôles</label>
+                    <div class="d-flex flex-column gap-3 ms-2">
+                        {% for checkbox in form.roles %}
+                            <div class="form-check fs-5">
+                                {{ form_widget(checkbox, {
+                                    'attr': {
+                                        'class': 'form-check-input',
+                                        'style': 'transform: scale(1.3); margin-right: 10px;'
+                                    }
+                                }) }}
+                                {{ form_label(checkbox, null, {'label_attr': {'class': 'form-check-label'}}) }}
+
+                                {% set role = checkbox.vars.value %}
+                                {% set badge = {
+                                    'ROLE_USER':    {label: 'Utilisateur',      class: 'bg-secondary'},
+                                    'ROLE_MAGASIN': {label: 'Magasin',         class: 'bg-warning text-dark'},
+                                    'ROLE_ENTREPOT':{label: 'Entrepôt',        class: 'bg-info text-dark'},
+                                    'ROLE_ADMIN':   {label: 'Admin',           class: 'bg-danger'},
+                                    'ROLE_ORDER_CREATE':     {label: 'Commandes',      class: 'bg-primary'},
+                                    'ROLE_WAREHOUSE_READ':   {label: 'Entrepôts',      class: 'bg-secondary'},
+                                    'ROLE_PRODUCT_READ':     {label: 'Produits',       class: 'bg-success'},
+                                    'ROLE_INVENTORY_READ':   {label: 'Inventaire',     class: 'bg-secondary'},
+                                    'ROLE_STORE_READ':       {label: 'Magasin (lecture)', class: 'bg-info text-dark'},
+                                    'ROLE_DELIVERY_READ':    {label: 'Livraisons',      class: 'bg-secondary'},
+                                    'ROLE_SUPER_ADMIN':      {label: 'Super Admin',     class: 'bg-dark'}
+                                }[role] %}
+
+                                {% if badge is defined %}
+                                    <span class="badge {{ badge.class }} ms-2">{{ badge.label }}</span>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-4 d-flex justify-content-between">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fa-solid fa-floppy-disk"></i> Enregistrer les modifications
+                </button>
+
+                <a href="{{ path('settings_users') }}" class="btn btn-outline-secondary">
+                    <i class="fa-solid fa-arrow-left"></i> Retour à la liste
+                </a>
+
+                {% if utilisateur.id %}
+                    <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal">
+                        <i class="fa-solid fa-trash"></i> Supprimer
+                    </button>
+                {% endif %}
+            </div>
+            {{ form_end(form) }}
+        </div>
+    </div>
+
+    {% if utilisateur.id %}
+        <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content border-danger">
+                    <div class="modal-header bg-danger text-white">
+                        <h5 class="modal-title" id="confirmDeleteModalLabel">Confirmation de suppression</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fermer"></button>
+                    </div>
+                    <div class="modal-body">
+                        Êtes-vous sûr de vouloir supprimer <strong>{{ utilisateur.username }}</strong> ? Cette action est irréversible.
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                        <form action="{{ path('settings_users_delete', {'id': utilisateur.id}) }}" method="post" class="d-inline">
+                            <input type="hidden" name="_token" value="{{ csrf_token('delete_user_' ~ utilisateur.id) }}">
+                            <button type="submit" class="btn btn-danger">
+                                <i class="fa-solid fa-trash"></i> Supprimer définitivement
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
