@@ -121,7 +121,7 @@ class StoreController extends AbstractController
                         ], 400);
                     }
 
-                    $inventory->setQuantity($available - $requested);
+                    // Не списываем сразу — только сохраняем цену и связь
                     $item->setUnitPrice($inventory->getPrice());
                     $item->setOrder($order);
                 }

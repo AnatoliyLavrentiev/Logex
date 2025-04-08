@@ -198,56 +198,44 @@ try {
         });
     });
 
-    // 🚀 Инициализация формы заказа
+    // Initialisation du formulaire de commande
     function initOrderForm() {
-        console.log("🚀 initOrderForm() appelé");
-
         const form = document.querySelector('#order-modal-content form');
         const addBtn = document.getElementById('add-item-btn');
         const itemsWrapper = document.getElementById('order-items-wrapper');
-
         if (!form || !addBtn || !itemsWrapper) {
-            console.warn("⛔ Élément du formulaire manquant");
+            console.warn("Élément du formulaire manquant");
             return;
         }
-
         let index = itemsWrapper.querySelectorAll('.order-item-form').length;
-
-        // Добавление нового элемента
+        // Ajout d’un nouvel article
         addBtn.addEventListener('click', () => {
             const prototype = itemsWrapper.dataset.prototype;
             const newForm = prototype.replace(/__name__/g, index);
             const wrapper = document.createElement('div');
             wrapper.className = 'order-item-form border rounded p-3 mb-3 position-relative bg-light';
             wrapper.innerHTML = newForm;
-
             const removeBtn = document.createElement('button');
             removeBtn.type = 'button';
             removeBtn.className = 'btn btn-outline-danger btn-sm position-absolute top-0 end-0 m-2 remove-item';
             removeBtn.innerHTML = '<i class="fa-solid fa-trash"></i>';
             removeBtn.addEventListener('click', () => wrapper.remove());
-
             wrapper.appendChild(removeBtn);
             itemsWrapper.appendChild(wrapper);
             index++;
-
             applyQuantityLimit(wrapper);
         });
-
-        // Применить лимит на уже существующие
+        // Application de la limite de quantité pour les éléments existants
         itemsWrapper.querySelectorAll('.order-item-form').forEach(applyQuantityLimit);
-
-        // Удаление существующих
+        // Suppression des éléments existants
         itemsWrapper.querySelectorAll('.remove-item').forEach(btn => {
             btn.addEventListener('click', () => btn.closest('.order-item-form').remove());
         });
-
-        // Обработка отправки формы
+        // Soumission du formulaire
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
             const formData = new FormData(form);
             const action = form.getAttribute('action');
-
             try {
                 const response = await fetch(action, {
                     method: 'POST',
@@ -257,14 +245,11 @@ try {
                     },
                     credentials: 'same-origin'
                 });
-
                 const contentType = response.headers.get('content-type');
-
                 if (!response.ok) {
                     const errorText = await response.text();
                     throw new Error(errorText);
                 }
-
                 if (contentType && contentType.includes('application/json')) {
                     const data = await response.json();
 
@@ -273,7 +258,6 @@ try {
                         successAlert.className = 'alert alert-success text-center fs-5';
                         successAlert.innerHTML = '✅ Commande créée avec succès ! Redirection...';
                         form.parentElement.prepend(successAlert);
-
                         setTimeout(() => {
                             window.location.href = data.redirect;
                         }, 2000);

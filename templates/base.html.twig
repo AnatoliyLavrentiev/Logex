@@ -27,6 +27,7 @@
             }
         }
     </style>
+    <link rel="icon" type="image/png" href="{{ asset('favicon.png') }}">
     {% endblock %}
 </head>
 <body data-theme="light">
@@ -126,9 +127,7 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-    console.log("✅ JS chargé et DOM prêt");
-    console.log("burgerButton:", document.getElementById('burgerButton'));
-console.log("mobileNavbar:", document.getElementById('mobileNavbar'));
+
     // === INIT ALERT CONTAINER ===
     const alertContainer = document.createElement('div');
     alertContainer.id = 'alert403Container';

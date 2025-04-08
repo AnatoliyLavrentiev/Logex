@@ -65,7 +65,7 @@ class ProductController extends AbstractController
         if (!empty($query)) {
             $qb->where('LOWER(p.prodname) LIKE :query')
                ->orWhere('LOWER(p.category) LIKE :query')
-               ->orWhere('LOWER(CAST(p.reference AS string)) LIKE :query')
+               ->orWhere('LOWER(CONCAT(p.reference, \'\')) LIKE :query')
                ->setParameter('query', '%' . strtolower($query) . '%');
         }
     
@@ -268,7 +268,7 @@ class ProductController extends AbstractController
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
     
-        // ❌ Убрали колонку 'Image'
+        
         $sheet->setCellValue('A1', 'Nom du produit');
         $sheet->setCellValue('B1', 'Référence du Produit');
         $sheet->setCellValue('C1', 'Description');

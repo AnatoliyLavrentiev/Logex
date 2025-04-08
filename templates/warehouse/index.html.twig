@@ -69,7 +69,7 @@
       action="{{ path('warehouse_delete', {'id': warehouse.id}) }}"
       class="d-inline-block delete-form"
       data-url="{{ path('warehouse_delete', {'id': warehouse.id}) }}"
-      onsubmit="return confirm('Etes-vous sûr de vouloir supprimer cet entrepôt ?');">
+      >
 
                                             <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ warehouse.id) }}">
                                             <button class="btn btn-outline-danger btn-sm action-btn" title="Supprimer">

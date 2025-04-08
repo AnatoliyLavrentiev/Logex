@@ -35,7 +35,6 @@ class Product
     #[ORM\Column(length: 255)]
     private ?string $category = null;
 
-    // Новое поле: Référence du produit (код товара без букв)
     #[ORM\Column(type: 'integer')]
     private ?int $reference = null;
 
